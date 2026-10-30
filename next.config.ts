@@ -1,24 +1,20 @@
 import type { NextConfig } from "next";
 
-const API_URL = process.env.API_URL ?? "http://51.21.181.215";
-
 const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
+    // Кабинеты защищены на клиенте (токены в localStorage), сервер их не рендерит —
+    // автопроверку «мгновенной навигации» отключаем, проверяются только сегменты с `export const instant`
+    instantInsights: {
+      validationLevel: "manual-warning",
+    },
   },
   cacheComponents: true,
   partialPrefetching: true,
 
-  // FastAPI различает /users и /users/, поэтому слэш в конце не трогаем
+  // FastAPI различает /users и /users/, поэтому слэш в конце не трогаем.
+  // Запросы /api/... проксирует src/app/api/[...path]/route.ts (адрес бэкенда — переменная API_URL)
   skipTrailingSlashRedirect: true,
-
-  // Браузер ходит на /api/..., Next пересылает запрос на бэкенд (без CORS)
-  async rewrites() {
-    return [
-      { source: "/api/:path*/", destination: `${API_URL}/:path*/` },
-      { source: "/api/:path*", destination: `${API_URL}/:path*` },
-    ];
-  },
 };
 
 export default nextConfig;
