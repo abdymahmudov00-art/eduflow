@@ -1,0 +1,94 @@
+.wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.trigger {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--color-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.trigger:hover,
+.triggerOpen {
+  transform: none;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.menu {
+  position: fixed;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.12s ease-out;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  color: var(--color-text);
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+
+.item:hover,
+.item:focus-visible {
+  transform: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.item svg {
+  color: var(--color-muted);
+}
+
+.item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.danger,
+.danger svg {
+  color: var(--color-danger);
+}
+
+.danger:hover,
+.danger:focus-visible {
+  background: var(--color-danger-soft);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}

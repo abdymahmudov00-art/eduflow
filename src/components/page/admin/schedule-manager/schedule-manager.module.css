@@ -1,0 +1,16 @@
+.manager {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.empty {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}

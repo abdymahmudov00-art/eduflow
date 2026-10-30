@@ -1,0 +1,38 @@
+.upload {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 18px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.actions {
+  margin: 6px 0 4px;
+}
+
+@media (max-width: 480px) {
+  .upload {
+    flex-direction: column;
+  }
+}

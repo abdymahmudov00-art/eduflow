@@ -1,0 +1,67 @@
+.action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  line-height: 1.35;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s, background-color 0.15s, transform 0.15s;
+}
+
+.action:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
+}
+
+.icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.violet {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.16);
+}
+
+.red {
+  color: #fca5a5;
+  background: rgba(248, 113, 113, 0.14);
+}
+
+.blue {
+  color: #93c5fd;
+  background: rgba(96, 165, 250, 0.14);
+}
+
+.amber {
+  color: #fcd34d;
+  background: rgba(251, 191, 36, 0.14);
+}
+
+.green {
+  color: #6ee7b7;
+  background: rgba(52, 211, 153, 0.14);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.description {
+  font-size: 12px;
+  color: var(--color-muted);
+}

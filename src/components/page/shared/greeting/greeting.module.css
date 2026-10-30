@@ -1,0 +1,33 @@
+.greeting {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.date {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.avatar {
+  line-height: 0;
+  border-radius: 50%;
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 24px;
+  }
+}
