@@ -1,8 +1,13 @@
 .hero {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "icon eyebrow badge link"
+    "icon name    badge link"
+    "icon meta    badge link";
   align-items: center;
-  gap: 22px;
+  column-gap: 22px;
   padding: 28px 30px;
   overflow: hidden;
   background: var(--gradient-hero);
@@ -23,9 +28,18 @@
   pointer-events: none;
 }
 
+.eyebrow {
+  grid-area: eyebrow;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .icon {
   display: grid;
-  flex-shrink: 0;
+  grid-area: icon;
   place-items: center;
   width: 72px;
   height: 72px;
@@ -35,22 +49,8 @@
   border-radius: 22px;
 }
 
-.copy {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.eyebrow {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-
 .name {
+  grid-area: name;
   margin: 4px 0;
   font-size: 44px;
   font-weight: 800;
@@ -58,7 +58,13 @@
   letter-spacing: -0.03em;
 }
 
+.badge {
+  grid-area: badge;
+  justify-self: start;
+}
+
 .meta {
+  grid-area: meta;
   font-size: 14px;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.72);
@@ -69,20 +75,61 @@
   color: var(--color-primary-text);
 }
 
+.link {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-area: link;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  transition: background-color 0.15s;
+}
+
+.link:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Телефон: подпись сверху, бейдж под названием, стрелка справа — как в макете */
 @media (max-width: 640px) {
   .hero {
-    flex-wrap: wrap;
-    gap: 14px;
-    padding: 22px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "eyebrow eyebrow eyebrow"
+      "icon    name    link"
+      "icon    badge   link"
+      "icon    meta    meta";
+    column-gap: 16px;
+    padding: 20px;
+  }
+
+  .eyebrow {
+    margin-bottom: 14px;
+    font-size: 11px;
   }
 
   .icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 17px;
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
   }
 
   .name {
-    font-size: 34px;
+    margin: 0 0 6px;
+    font-size: 28px;
+  }
+
+  .meta {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+
+  .link {
+    width: 44px;
+    height: 44px;
   }
 }

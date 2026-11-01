@@ -39,6 +39,13 @@ const Header = ({ items, profileHref, onMenuClick }: HeaderProps) => {
           <Icon name="menu" />
         </button>
         <span className={styles.title}>{title}</span>
+        {/* На телефоне вместо названия раздела — логотип */}
+        <Link href={items[0]?.href ?? "/"} className={styles.logo}>
+          <span className={styles.mark}>
+            <Icon name="sparkle" size={20} />
+          </span>
+          EduFlow
+        </Link>
       </div>
 
       {session && (
@@ -48,11 +55,11 @@ const Header = ({ items, profileHref, onMenuClick }: HeaderProps) => {
             {ROLE_LABELS[session.role]}
           </span>
           <Link href={profileHref} className={styles.avatarLink} aria-label="Профиль">
-            <Avatar name={session.username} size={36} />
+            <Avatar name={session.username} size={40} />
           </Link>
           <button
             type="button"
-            className={styles.iconBtn}
+            className={`${styles.iconBtn} ${styles.logoutBtn}`}
             onClick={handleLogout}
             disabled={leaving}
             aria-label="Выйти"

@@ -185,6 +185,37 @@
   margin-top: 16px;
 }
 
+/* «Все разделы» — только на телефоне, на компьютере меню и так слева */
+.allSections {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 8px 16px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.allSections:hover {
+  transform: none;
+  background: var(--color-surface-2);
+}
+
+@media (max-width: 960px) {
+  .allSections {
+    display: inline-flex;
+  }
+
+  .homeStack {
+    gap: 24px;
+  }
+}
+
 @media (max-width: 1100px) {
   .tiles {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -204,7 +235,11 @@
   }
 
   .tiles {
-    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sectionTitle {
+    font-size: 19px;
   }
 
   .sheetHead {

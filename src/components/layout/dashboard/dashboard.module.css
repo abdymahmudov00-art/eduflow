@@ -14,11 +14,25 @@
 }
 
 @media (max-width: 960px) {
+  /* Фиолетовые «свечения» на фоне, как в мобильном макете */
+  .dashboard::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60% 40% at 100% 0%, rgba(139, 92, 246, 0.32) 0%, rgba(139, 92, 246, 0) 70%),
+      radial-gradient(50% 35% at 0% 75%, rgba(124, 58, 237, 0.16) 0%, rgba(124, 58, 237, 0) 70%),
+      var(--color-bg);
+    pointer-events: none;
+  }
+
   .main {
     margin-left: 0;
   }
 
   .content {
-    padding: 24px 16px 48px;
+    /* Снизу место под нижнюю панель */
+    padding: 8px 16px calc(120px + env(safe-area-inset-bottom));
   }
 }

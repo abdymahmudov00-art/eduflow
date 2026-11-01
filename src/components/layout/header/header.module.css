@@ -73,18 +73,49 @@
   border-radius: 12px;
 }
 
-@media (max-width: 960px) {
-  .header {
-    padding: 0 16px;
-  }
-
-  .menuBtn {
-    display: grid;
-  }
+.logo {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
-@media (max-width: 520px) {
-  .chip {
+.mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: #fff;
+  background: var(--gradient-brand);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px -6px rgba(139, 92, 246, 0.8);
+}
+
+/* Телефон: прозрачная шапка с логотипом и аватаром, меню — в нижней панели */
+@media (max-width: 960px) {
+  .header {
+    position: static;
+    height: 76px;
+    padding: 0 16px;
+    padding-top: env(safe-area-inset-top);
+    background: transparent;
+    border-bottom: 0;
+    backdrop-filter: none;
+  }
+
+  .title,
+  .chip,
+  .logoutBtn {
     display: none;
+  }
+
+  .logo {
+    display: inline-flex;
+  }
+
+  .avatarLink {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
   }
 }

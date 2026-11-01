@@ -11,10 +11,12 @@ interface GreetingProps {
   /** Полное имя для аватара (по умолчанию name) */
   avatarName?: string;
   profileHref: string;
+  /** Строка под приветствием */
+  subtitle?: string;
 }
 
 /** Приветствие на главной: дата, «Добрый день, Имя» и аватар */
-const Greeting = ({ name, avatarName, profileHref }: GreetingProps) => {
+const Greeting = ({ name, avatarName, profileHref, subtitle }: GreetingProps) => {
   const today = useToday();
 
   return (
@@ -22,8 +24,12 @@ const Greeting = ({ name, avatarName, profileHref }: GreetingProps) => {
       <div>
         <span className={styles.date}>{today ? formatTodayLabel(today) : " "}</span>
         <h1 className={styles.title}>
-          {today ? greetingFor(today) : "Здравствуйте"}, {name}
+          {today ? greetingFor(today) : "Здравствуйте"}, {name}{" "}
+          <span className={styles.wave} aria-hidden="true">
+            👋
+          </span>
         </h1>
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       </div>
       <Link href={profileHref} aria-label="Профиль" className={styles.avatar}>
         <Avatar name={avatarName ?? name} size={44} />

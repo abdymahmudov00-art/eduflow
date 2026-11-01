@@ -76,17 +76,48 @@
 
 .arrow {
   position: absolute;
-  right: 20px;
-  bottom: 20px;
+  top: 24px;
+  right: 18px;
+  color: var(--color-muted);
+  transition: color 0.15s, transform 0.15s;
+}
+
+.tile:hover .arrow {
   color: var(--color-primary-text);
+  transform: translateX(2px);
 }
 
 @media (max-width: 640px) {
   .tile {
-    min-height: 160px;
+    min-height: 0;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .tile:hover {
+    transform: none;
   }
 
   .icon {
-    margin-bottom: 14px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+  }
+
+  .title {
+    margin-bottom: 4px;
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .description {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .arrow {
+    top: 20px;
+    right: 14px;
   }
 }

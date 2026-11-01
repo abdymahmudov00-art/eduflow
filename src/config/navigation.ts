@@ -23,6 +23,19 @@ export const STUDENT_NAV: NavItem[] = [
   { href: "/student/study", label: "Учебный процесс", icon: "book" },
 ];
 
+/** Нижняя панель на телефоне: самые нужные разделы, остальное — в «Ещё» */
+export const STUDENT_TABS: NavItem[] = [
+  { href: "/student", label: "Главная", icon: "home" },
+  { href: "/student/schedule", label: "Расписание", icon: "calendar" },
+  { href: "/student/study", label: "Учёба", icon: "book" },
+];
+
+export const ADMIN_TABS: NavItem[] = [
+  { href: "/admin", label: "Главная", icon: "home" },
+  { href: "/admin/payments", label: "Платежи", icon: "wallet" },
+  { href: "/admin/students", label: "Студенты", icon: "users" },
+];
+
 /** Активный пункт — самый длинный подходящий путь («/admin» не горит на «/admin/users») */
 export function findActiveItem(items: NavItem[], pathname: string): NavItem | undefined {
   return items

@@ -1,5 +1,8 @@
 "use client";
 
+import { useOpenMenu } from "@/components/layout/dashboard/menu-context";
+import PromoBanner from "@/components/page/student/promo-banner/PromoBanner";
+import Icon from "@/components/ui/icon/Icon";
 import GroupHero from "@/components/page/student/group-hero/GroupHero";
 import Greeting from "@/components/page/shared/greeting/Greeting";
 import AsyncState from "@/components/ui/async-state/AsyncState";
@@ -25,6 +28,7 @@ async function loadHome() {
 /** Главная студента: текущая группа и четыре раздела кабинета */
 export default function StudentHomePage() {
   const { session } = useAuth();
+  const openMenu = useOpenMenu();
   const { data, loading, error, reload } = useFetch(loadHome);
   const info = data?.student.personal_info;
 
@@ -34,6 +38,7 @@ export default function StudentHomePage() {
         name={info?.first_name ?? session?.username ?? ""}
         avatarName={info ? `${info.first_name} ${info.last_name}` : session?.username}
         profileHref="/student/profile"
+        subtitle="Хорошего продуктивного дня!"
       />
 
       <AsyncState loading={loading} error={error} onRetry={reload}>
@@ -42,21 +47,27 @@ export default function StudentHomePage() {
             <GroupHero group={data.group} />
 
             <section>
-              <h2 className={styles.sectionTitle}>Разделы кабинета</h2>
+              <div className={styles.sectionHead}>
+                <h2 className={styles.sectionTitle}>Быстрый доступ</h2>
+                <button type="button" className={styles.allSections} onClick={openMenu}>
+                  Все разделы
+                  <Icon name="chevron" size={16} />
+                </button>
+              </div>
               <div className={styles.tiles}>
                 <SectionTile
                   href="/student/personal"
                   icon="idcard"
                   tone="violet"
                   title="Личная информация"
-                  description="Анкета, фото и статус проверки"
+                  description="Анкета, фото и статус"
                 />
                 <SectionTile
                   href="/student/contract"
                   icon="wallet"
                   tone="green"
                   title="Контракт"
-                  description="Оплаты по месяцам"
+                  description="Договор и оплаты"
                 />
                 <SectionTile
                   href="/student/schedule"
@@ -68,12 +79,14 @@ export default function StudentHomePage() {
                 <SectionTile
                   href="/student/study"
                   icon="book"
-                  tone="pink"
+                  tone="blue"
                   title="Учебный процесс"
                   description="Оценки и посещаемость"
                 />
               </div>
             </section>
+
+            <PromoBanner />
           </div>
         )}
       </AsyncState>

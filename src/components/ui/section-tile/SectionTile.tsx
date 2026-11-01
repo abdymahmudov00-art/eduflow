@@ -12,7 +12,7 @@ interface SectionTileProps {
   tag?: string;
 }
 
-/** Большая плитка раздела кабинета со стрелкой ↗ */
+/** Плитка раздела кабинета: иконка, название, описание и стрелка › */
 const SectionTile = ({ href, icon, title, description, tone = "violet", tag }: SectionTileProps) => (
   <Link href={href} className={styles.tile}>
     <span className={`${styles.icon} ${styles[tone]}`}>
@@ -21,7 +21,7 @@ const SectionTile = ({ href, icon, title, description, tone = "violet", tag }: S
     <span className={styles.title}>{title}</span>
     <span className={styles.description}>{description}</span>
     {tag && <span className={styles.tag}>{tag}</span>}
-    <Icon name="arrowUpRight" size={22} className={styles.arrow} />
+    <Icon name="chevron" size={20} className={styles.arrow} />
   </Link>
 );
 

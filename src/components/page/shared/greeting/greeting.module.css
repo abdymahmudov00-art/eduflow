@@ -1,6 +1,6 @@
 .greeting {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
@@ -26,7 +26,29 @@
   border-radius: 50%;
 }
 
-@media (max-width: 480px) {
+.subtitle {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--color-muted);
+}
+
+.wave {
+  display: inline-block;
+  transform-origin: 70% 70%;
+}
+
+/* На телефоне аватар уже в шапке */
+@media (max-width: 960px) {
+  .avatar {
+    display: none;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 380px) {
   .title {
     font-size: 24px;
   }
