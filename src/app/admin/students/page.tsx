@@ -25,7 +25,18 @@ import { useFetch } from "@/lib/hooks/useFetch";
 import { useStudentPhoto } from "@/lib/hooks/useStudentPhoto";
 import styles from "../admin.module.css";
 
-type Filter = "all" | "review";
+type Filter = "all" | "approved" | "review" | "rejected";
+
+/** Порядок в «Все»: сначала принятые, потом на проверке, потом остальные */
+const STATUS_ORDER: Record<string, number> = { approved: 0, pending: 1, revision: 2, not_submitted: 3 };
+const statusRank = (s: Student) => (s.personal_info ? STATUS_ORDER[s.personal_info.status] ?? 3 : 4);
+
+const EMPTY_TEXT: Record<Filter, string> = {
+  all: "Студентов пока нет",
+  approved: "Принятых анкет пока нет",
+  review: "Анкет на проверке нет",
+  rejected: "Непринятых анкет нет",
+};
 
 async function loadStudents() {
   const [students, groups] = await Promise.all([studentsApi.list(), groupsApi.list()]);
@@ -64,10 +75,24 @@ export default function StudentsPage() {
   const groupName = new Map((data?.groups ?? []).map((g) => [g.id, g.name]));
   const profileStudent = students.find((s) => s.id === profileId) ?? null;
   const transferStudent = students.find((s) => s.id === transferId) ?? null;
+  const approved = students.filter((s) => s.personal_info?.status === "approved");
   const toReview = students.filter((s) => s.personal_info?.status === "pending");
+  // Не приняты: возвращены на исправление или анкету ещё не заполнили
+  const rejected = students.filter((s) => {
+    const status = s.personal_info?.status;
+    return status !== "approved" && status !== "pending";
+  });
+  const byFilter: Record<Filter, Student[]> = {
+    all: [...students].sort(
+      (a, b) => statusRank(a) - statusRank(b) || a.student_number.localeCompare(b.student_number, "ru", { numeric: true }),
+    ),
+    approved,
+    review: toReview,
+    rejected,
+  };
 
   const query = search.trim().toLowerCase();
-  const rows = (filter === "review" ? toReview : students).filter((s) => {
+  const rows = byFilter[filter].filter((s) => {
     if (!query) return true;
     const info = s.personal_info;
     return [s.student_number, info?.first_name, info?.last_name, info?.middle_name, info?.phone]
@@ -129,13 +154,15 @@ export default function StudentsPage() {
           onChange={setFilter}
           items={[
             { value: "all", label: "Все", count: students.length },
-            { value: "review", label: "Анкеты на проверке", count: toReview.length },
+            { value: "approved", label: "Принятые", count: approved.length },
+            { value: "review", label: "На проверке", count: toReview.length },
+            { value: "rejected", label: "Не приняты", count: rejected.length },
           ]}
         />
         <Table<Student>
           rows={rows}
           rowKey={(s) => s.id}
-          emptyText={query ? "Никого не нашли" : filter === "review" ? "Анкет на проверке нет" : "Студентов пока нет"}
+          emptyText={query ? "Никого не нашли" : EMPTY_TEXT[filter]}
           columns={[
             { key: "number", header: "Номер", render: (s) => s.student_number },
             { key: "name", header: "ФИО", render: (s) => <strong>{fullName(s.personal_info)}</strong> },

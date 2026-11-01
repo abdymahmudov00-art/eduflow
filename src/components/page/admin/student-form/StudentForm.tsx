@@ -104,7 +104,7 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
 
       <p className={styles.note}>
         Личные данные студент заполнит сам в разделе «Личная информация». Анкета придёт вам на
-        проверку во вкладку «Анкеты на проверке».
+        проверку во вкладку «На проверке».
       </p>
 
       <FormActions>
