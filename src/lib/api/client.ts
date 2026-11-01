@@ -35,6 +35,14 @@ function parseDetail(body: unknown): string | null {
   return null;
 }
 
+/** Если бэкенд не прислал detail */
+const DEFAULT_MESSAGES: Record<number, string> = {
+  403: "Недостаточно прав для этого действия",
+  404: "Не найдено",
+  409: "Конфликт: такая запись уже есть. Обновите страницу",
+  502: "Бэкенд недоступен. Попробуйте позже",
+};
+
 let refreshPromise: Promise<string | null> | null = null;
 
 /** Обновляет пару токенов. Параллельные запросы ждут один и тот же refresh */
@@ -110,7 +118,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   if (!res.ok) {
     const data = await res.json().catch(() => null);
-    throw new ApiError(res.status, parseDetail(data) ?? `Ошибка сервера (${res.status})`);
+    throw new ApiError(res.status, parseDetail(data) ?? DEFAULT_MESSAGES[res.status] ?? `Ошибка сервера (${res.status})`);
   }
 
   if (res.status === 204) return undefined as T;

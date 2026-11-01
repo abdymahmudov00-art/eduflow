@@ -91,3 +91,17 @@
   color: var(--color-info);
   background: var(--color-info-soft);
 }
+
+.partial {
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.partial .status {
+  color: var(--color-info);
+  background: var(--color-info-soft);
+}
+
+.partial .hint {
+  font-weight: 600;
+  color: var(--color-text);
+}

@@ -195,8 +195,9 @@ export interface Payment {
   payment_month: string;
 }
 
-/** request_id клиент добавляет сам (см. paymentsApi.create) */
+/** request_id можно не передавать — paymentsApi.create сгенерирует его сам */
 export interface PaymentCreate {
+  request_id?: string;
   contract_id: number;
   amount: Money;
   payment_method?: string | null;
@@ -205,11 +206,12 @@ export interface PaymentCreate {
 }
 
 /** Ответ /payments/my/balance — суммы приходят числами */
+/** Суммы могут прийти числом или строкой (Decimal) — читать через toNumber */
 export interface Balance {
   contract_id: number;
-  total_amount: number;
-  paid_amount: number;
-  remaining_amount: number;
+  total_amount: Money;
+  paid_amount: Money;
+  remaining_amount: Money;
   paid_months: number;
   duration_months: number;
 }

@@ -1,19 +1,30 @@
 import ProgressBar from "@/components/ui/progress-bar/ProgressBar";
 import StatusBadge from "@/components/ui/status-badge/StatusBadge";
-import type { Balance, Contract } from "@/lib/api/types";
+import type { Balance, Contract, Payment } from "@/lib/api/types";
 import { formatDate, formatMoney, toNumber } from "@/lib/format";
 import styles from "./balance-card.module.css";
 
 interface BalanceCardProps {
   contract: Contract;
   balance?: Balance;
+  /** Платежи студента: для запасного расчёта и суммы «на проверке» */
+  payments?: Payment[];
 }
 
-const BalanceCard = ({ contract, balance }: BalanceCardProps) => {
-  const total = balance?.total_amount ?? toNumber(contract.total_amount);
-  const paid = balance?.paid_amount ?? 0;
-  const remaining = balance?.remaining_amount ?? total;
-  const percent = total > 0 ? (paid / total) * 100 : 0;
+const BalanceCard = ({ contract, balance, payments = [] }: BalanceCardProps) => {
+  // Суммы приходят числом или строкой (Decimal) — приводим к числу.
+  // Если баланса нет, считаем по подтверждённым платежам.
+  const total = balance ? toNumber(balance.total_amount) : toNumber(contract.total_amount);
+  const paid = balance
+    ? toNumber(balance.paid_amount)
+    : payments
+        .filter((p) => p.contract_id === contract.id && p.status === "confirmed")
+        .reduce((sum, p) => sum + toNumber(p.amount), 0);
+  const remaining = balance ? toNumber(balance.remaining_amount) : Math.max(total - paid, 0);
+  const pending = payments
+    .filter((p) => p.contract_id === contract.id && p.status === "pending")
+    .reduce((sum, p) => sum + toNumber(p.amount), 0);
+  const percent = total > 0 ? Math.min((paid / total) * 100, 100) : 0;
 
   return (
     <article className={styles.card}>
@@ -37,6 +48,7 @@ const BalanceCard = ({ contract, balance }: BalanceCardProps) => {
       </div>
 
       <ProgressBar value={percent} label="Оплачено от суммы контракта" />
+      {pending > 0 && <p className={styles.pending}>Ещё {formatMoney(pending)} на проверке у администратора</p>}
 
       <dl className={styles.details}>
         <div>

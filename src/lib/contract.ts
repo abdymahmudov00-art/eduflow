@@ -3,7 +3,7 @@
 import type { AcademicLeave, Contract, Payment } from "@/lib/api/types";
 import { toNumber } from "@/lib/format";
 
-export type MonthStatus = "paid" | "pending" | "leave" | "rejected" | "expected";
+export type MonthStatus = "paid" | "partial" | "pending" | "leave" | "rejected" | "expected";
 
 export interface ContractMonth {
   /** Порядковый номер месяца контракта, с 1 */
@@ -16,6 +16,12 @@ export interface ContractMonth {
   leave: AcademicLeave | null;
   /** Сумма подтверждённых платежей за месяц */
   paidAmount: number;
+  /** Сумма платежей, которые ждут проверки */
+  pendingAmount: number;
+  /** Сколько нужно заплатить за месяц (ежемесячный платёж) */
+  dueAmount: number;
+  /** Сколько ещё можно внести: due − подтверждённые − на проверке (не меньше 0) */
+  remainingAmount: number;
 }
 
 /** "2026-09" + 3 → "2026-12" */
@@ -47,9 +53,16 @@ function leaveFor(contract: Contract, key: string): AcademicLeave | null {
   );
 }
 
-function statusFor(payments: Payment[], leave: AcademicLeave | null): MonthStatus {
-  if (payments.some((p) => p.status === "confirmed")) return "paid";
+/** Округление до копеек, чтобы 0.1 + 0.2 не давало «недоплату» */
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+const sumOf = (payments: Payment[], status: Payment["status"]) =>
+  round2(payments.filter((p) => p.status === status).reduce((sum, p) => sum + toNumber(p.amount), 0));
+
+function statusFor(payments: Payment[], leave: AcademicLeave | null, paid: number, due: number): MonthStatus {
+  if (paid > 0 && paid >= due) return "paid";
   if (payments.some((p) => p.status === "pending")) return "pending";
+  if (paid > 0) return "partial";
   if (leave) return "leave";
   if (payments.some((p) => p.status === "rejected")) return "rejected";
   return "expected";
@@ -59,24 +72,45 @@ function statusFor(payments: Payment[], leave: AcademicLeave | null): MonthStatu
 export function buildContractMonths(contract: Contract, payments: Payment[]): ContractMonth[] {
   const start = contractStartMonth(contract);
   const own = payments.filter((p) => p.contract_id === contract.id);
+  const due = toNumber(contract.monthly_payment);
   return Array.from({ length: contract.duration_months }, (_, i) => {
     const key = addMonths(start, i);
     const monthPayments = own.filter((p) => p.payment_month === key);
     const leave = leaveFor(contract, key);
+    const paidAmount = sumOf(monthPayments, "confirmed");
+    const pendingAmount = sumOf(monthPayments, "pending");
     return {
       index: i + 1,
       key,
-      status: statusFor(monthPayments, leave),
+      status: statusFor(monthPayments, leave, paidAmount, due),
       payments: monthPayments,
       leave,
-      paidAmount: monthPayments
-        .filter((p) => p.status === "confirmed")
-        .reduce((sum, p) => sum + toNumber(p.amount), 0),
+      paidAmount,
+      pendingAmount,
+      dueAmount: due,
+      remainingAmount: Math.max(round2(due - paidAmount - pendingAmount), 0),
     };
   });
 }
 
-/** Первый месяц, который ещё не оплачен и не на проверке — его удобно предлагать по умолчанию */
+/** Можно ли сейчас внести оплату за месяц */
+export function isMonthOpen(month: ContractMonth): boolean {
+  return month.status !== "leave" && month.remainingAmount > 0;
+}
+
+/**
+ * Почему за месяц нельзя заплатить (null — можно).
+ * Бэкенд тоже запрещает повторную оплату (409), но лучше предупредить заранее.
+ */
+export function monthBlockReason(month: ContractMonth | undefined): string | null {
+  if (!month) return "Этот месяц не входит в срок контракта";
+  if (month.status === "leave") return "Академический отпуск — оплата за этот месяц не нужна";
+  if (month.status === "paid") return "Этот месяц уже оплачен полностью";
+  if (month.remainingAmount <= 0) return "За этот месяц уже есть платёж на проверке на всю сумму";
+  return null;
+}
+
+/** Первый месяц, за который ещё можно заплатить — его удобно предлагать по умолчанию */
 export function firstOpenMonth(months: ContractMonth[]): string | undefined {
-  return months.find((m) => m.status === "expected" || m.status === "rejected")?.key;
+  return months.find(isMonthOpen)?.key;
 }

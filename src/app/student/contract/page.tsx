@@ -18,7 +18,7 @@ import GroupHistory from "@/components/page/shared/group-history/GroupHistory";
 import { contractsApi, groupsApi, paymentsApi, studentsApi } from "@/lib/api";
 import type { Payment } from "@/lib/api/types";
 import { activeLeaves, buildContractMonths, firstOpenMonth } from "@/lib/contract";
-import { isNotFound } from "@/lib/errors";
+import { isConflict, isNotFound } from "@/lib/errors";
 import { formatDate, formatDateTime, formatMoney, formatMonth } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
 import { paymentMethodLabel } from "@/lib/labels";
@@ -101,7 +101,11 @@ export default function StudentContractPage() {
             )}
 
             <div className={styles.summaryGrid}>
-              <BalanceCard contract={contract} balance={data.balances.find((b) => b.contract_id === contract.id)} />
+              <BalanceCard
+                contract={contract}
+                balance={data.balances.find((b) => b.contract_id === contract.id)}
+                payments={data.payments}
+              />
               <GroupPanel group={data.group} />
             </div>
 
@@ -146,11 +150,18 @@ export default function StudentContractPage() {
         <PaymentForm
           contracts={activeContracts}
           balances={data?.balances ?? []}
+          payments={data?.payments ?? []}
           defaultContractId={contract?.id}
           defaultMonth={firstOpenMonth(months)}
           onCancel={() => setPaying(false)}
           onSubmit={async (values) => {
-            await paymentsApi.create(values);
+            try {
+              await paymentsApi.create(values);
+            } catch (err) {
+              // 409: месяц уже оплачен или платёж уже есть — подтягиваем свежие данные
+              if (isConflict(err)) reload();
+              throw err;
+            }
             setPaying(false);
             setSuccess(true);
             reload();

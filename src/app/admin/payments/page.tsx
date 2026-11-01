@@ -18,8 +18,8 @@ import Tabs from "@/components/ui/tabs/Tabs";
 import Card from "@/components/ui/card/Card";
 import { contractsApi, paymentsApi, studentsApi } from "@/lib/api";
 import type { Payment, PaymentStatus } from "@/lib/api/types";
-import { buildContractMonths, contractEndMonth, contractStartMonth } from "@/lib/contract";
-import { getErrorMessage } from "@/lib/errors";
+import { buildContractMonths, contractEndMonth, contractStartMonth, isMonthOpen } from "@/lib/contract";
+import { getErrorMessage, isConflict } from "@/lib/errors";
 import { formatDateTime, formatMoney, formatMonth, fullName, toNumber } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
 import { paymentMethodLabel } from "@/lib/labels";
@@ -80,6 +80,8 @@ export default function AdminPaymentsPage() {
       reload();
     } catch (err) {
       setActionError(getErrorMessage(err));
+      // 409: статус уже поменяли (другой админ) или месяц уже оплачен — показываем свежие данные
+      if (isConflict(err)) reload();
     } finally {
       setBusyId(null);
     }
@@ -114,7 +116,7 @@ export default function AdminPaymentsPage() {
   return (
     <>
       <PageHeader
-        kicker="Контракт / оплаты"
+        kicker="Платежи"
         title="Подтверждение оплат"
         description="Студент сообщает об оплате — вы подтверждаете. Оплату наличными можно отметить самому во вкладке «По контракту»."
       />
@@ -266,10 +268,10 @@ export default function AdminPaymentsPage() {
                       </div>
                     ));
                   }
-                  if ((month.status === "expected" || month.status === "rejected") && selected.status === "active") {
+                  if (isMonthOpen(month) && selected.status === "active") {
                     return (
                       <Button variant="secondary" size="sm" icon="plus" onClick={() => setManualMonth(month.key)}>
-                        Отметить оплату
+                        {month.status === "partial" ? "Доплата" : "Отметить оплату"}
                       </Button>
                     );
                   }
@@ -298,10 +300,16 @@ export default function AdminPaymentsPage() {
         {manualMonth && selected && (
           <ManualPaymentForm
             contract={selected}
+            months={months}
             month={manualMonth}
             onCancel={() => setManualMonth(null)}
             onSubmit={async (values) => {
-              await paymentsApi.create(values);
+              try {
+                await paymentsApi.create(values);
+              } catch (err) {
+                if (isConflict(err)) reload();
+                throw err;
+              }
               setManualMonth(null);
               setNotice(`Оплата за ${formatMonth(values.payment_month)} отмечена`);
               reload();

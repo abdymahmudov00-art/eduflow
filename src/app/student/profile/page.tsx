@@ -11,7 +11,7 @@ import Card from "@/components/ui/card/Card";
 import { contractsApi, groupsApi, paymentsApi, studentsApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth/useAuth";
 import { isNotFound } from "@/lib/errors";
-import { formatDate, formatMoney, fullName } from "@/lib/format";
+import { formatDate, formatMoney, fullName, toNumber } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
 import { useStudentPhoto } from "@/lib/hooks/useStudentPhoto";
 import styles from "../student.module.css";
@@ -36,7 +36,7 @@ export default function StudentProfilePage() {
   const { data, loading, error, reload } = useFetch(loadProfile);
   const [leaving, setLeaving] = useState(false);
 
-  const paid = data?.balances.reduce((sum, b) => sum + b.paid_amount, 0) ?? 0;
+  const paid = data?.balances.reduce((sum, b) => sum + toNumber(b.paid_amount), 0) ?? 0;
   const info = data?.student.personal_info;
   const photoUrl = useStudentPhoto(data?.student.id);
 

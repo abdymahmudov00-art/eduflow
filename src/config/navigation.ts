@@ -8,7 +8,7 @@ export interface NavItem {
 
 export const ADMIN_NAV: NavItem[] = [
   { href: "/admin", label: "Главная", icon: "home" },
-  { href: "/admin/payments", label: "Контракт / оплаты", icon: "wallet" },
+  { href: "/admin/payments", label: "Платежи", icon: "wallet" },
   { href: "/admin/contracts", label: "Контракты", icon: "file" },
   { href: "/admin/groups", label: "Группы", icon: "layers" },
   { href: "/admin/students", label: "Студенты", icon: "users" },
