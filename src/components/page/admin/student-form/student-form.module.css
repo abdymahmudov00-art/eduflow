@@ -1,0 +1,9 @@
+.note {
+  margin: 4px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
