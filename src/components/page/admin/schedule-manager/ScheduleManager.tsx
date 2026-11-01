@@ -8,6 +8,7 @@ import Button from "@/components/ui/button/Button";
 import { schedulesApi } from "@/lib/api";
 import type { Group, Schedule } from "@/lib/api/types";
 import { getErrorMessage } from "@/lib/errors";
+import { weekdayLabel } from "@/lib/labels";
 import styles from "./schedule-manager.module.css";
 
 interface ScheduleManagerProps {
@@ -44,10 +45,28 @@ const ScheduleManager = ({ group, onChanged }: ScheduleManagerProps) => {
         lesson={lesson}
         onCancel={() => setMode("list")}
         onSubmit={async (values) => {
-          if (lesson) await schedulesApi.update(lesson.id, values);
-          else await schedulesApi.create(values);
+          if (lesson) {
+            await schedulesApi.update(lesson.id, values[0]);
+            setMode("list");
+            onChanged();
+            return;
+          }
+          // Создаём по занятию на каждый день; ошибки (например, пересечение) собираем по дням
+          const failed: string[] = [];
+          for (const value of values) {
+            try {
+              await schedulesApi.create(value);
+            } catch (err) {
+              failed.push(`${weekdayLabel(value.weekday)}: ${getErrorMessage(err)}`);
+            }
+          }
+          if (failed.length === values.length) {
+            // Ничего не добавилось — оставляем форму открытой с ошибкой
+            throw new Error(failed.join("; "));
+          }
           setMode("list");
           onChanged();
+          if (failed.length > 0) setError(`Не все дни добавлены. ${failed.join("; ")}`);
         }}
       />
     );

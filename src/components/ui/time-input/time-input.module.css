@@ -1,0 +1,136 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+.control {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  padding: 11px 44px 11px 14px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.input::placeholder {
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.invalid {
+  border-color: var(--color-danger);
+}
+
+.toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--color-muted);
+  background: transparent;
+  border-radius: 8px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.toggle:hover,
+.toggleOpen {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-50%);
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 64px;
+  max-height: 232px;
+  padding-right: 2px;
+  overflow-y: auto;
+}
+
+.columnTitle {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 4px 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  background: var(--color-surface-2);
+}
+
+.cell {
+  flex-shrink: 0;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cell:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.cellActive,
+.cellActive:hover {
+  color: #fff;
+  background: var(--color-primary);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--color-danger);
+}

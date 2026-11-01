@@ -4,7 +4,8 @@ import { useState, type FormEvent } from "react";
 import Alert from "@/components/ui/alert/Alert";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
-import Select from "@/components/ui/select/Select";
+import DateInput from "@/components/ui/date-input/DateInput";
+import Combobox from "@/components/ui/combobox/Combobox";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import type { Contract, ContractInput, Student } from "@/lib/api/types";
 import { getErrorMessage } from "@/lib/errors";
@@ -76,10 +77,9 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
     }
   };
 
-  const studentOptions = students.map((s) => ({
-    value: String(s.id),
-    label: `${fullName(s.personal_info)} · ${s.student_number}`,
-  }));
+  const studentOptions = students
+    .map((s) => ({ value: String(s.id), label: fullName(s.personal_info), hint: s.student_number }))
+    .sort((a, b) => a.label.localeCompare(b.label, "ru"));
 
   return (
     <form onSubmit={handleSubmit} noValidate>
@@ -90,14 +90,14 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
       )}
       <FormGrid>
         <FullRow>
-          <Select
+          <Combobox
             label="Студент"
             required
-            placeholder="Выберите студента"
+            placeholder="Введите имя, фамилию или номер студента"
             options={studentOptions}
             value={studentId}
             error={errors.student_id}
-            onChange={(e) => setStudentId(e.target.value)}
+            onChange={setStudentId}
           />
         </FullRow>
         <Input
@@ -128,13 +128,12 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
           hint={suggestedMonthly ? `Сумма ÷ срок = ${formatMoney(suggestedMonthly)}` : undefined}
           onChange={(e) => setMonthly(e.target.value)}
         />
-        <Input
+        <DateInput
           label="Дата начала"
           required
-          type="date"
           value={startDate}
           error={errors.start_date}
-          onChange={(e) => setStartDate(e.target.value)}
+          onChange={setStartDate}
         />
         <Input
           label="День оплаты"

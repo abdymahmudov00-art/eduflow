@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Alert from "@/components/ui/alert/Alert";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
+import DateInput from "@/components/ui/date-input/DateInput";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import type { Group, GroupInput } from "@/lib/api/types";
 import { getErrorMessage } from "@/lib/errors";
@@ -84,20 +85,18 @@ const GroupForm = ({ group, onSubmit, onCancel }: GroupFormProps) => {
             onChange={(e) => setCourseName(e.target.value)}
           />
         </FullRow>
-        <Input
+        <DateInput
           label="Дата начала"
           required
-          type="date"
           value={startDate}
           error={errors.start_date}
-          onChange={(e) => setStartDate(e.target.value)}
+          onChange={setStartDate}
         />
-        <Input
+        <DateInput
           label="Дата окончания"
-          type="date"
           value={endDate}
           error={errors.end_date}
-          onChange={(e) => setEndDate(e.target.value)}
+          onChange={setEndDate}
         />
       </FormGrid>
       <FormActions>

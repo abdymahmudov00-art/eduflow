@@ -1,4 +1,5 @@
 import Input from "@/components/ui/input/Input";
+import DateInput from "@/components/ui/date-input/DateInput";
 import { FormGrid, FormSection, FullRow } from "@/components/ui/form-layout/FormLayout";
 
 export interface PersonalInfoValues {
@@ -119,13 +120,12 @@ const PersonalInfoFields = ({ values, errors, onChange, sectioned = false }: Per
     />
   );
   const birthDate = (
-    <Input
+    <DateInput
       label="Дата рождения"
       required
-      type="date"
       value={values.birth_date}
       error={errors.birth_date}
-      onChange={(e) => onChange("birth_date", e.target.value)}
+      onChange={(v) => onChange("birth_date", v)}
     />
   );
   const middleName = (

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Alert from "@/components/ui/alert/Alert";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
+import MonthInput from "@/components/ui/month-input/MonthInput";
 import Select from "@/components/ui/select/Select";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import type { Balance, Contract, PaymentCreate } from "@/lib/api/types";
@@ -110,13 +111,12 @@ const PaymentForm = ({
           hint={contract ? `Ежемесячный платёж: ${formatMoney(contract.monthly_payment)}` : undefined}
           onChange={(e) => setAmount(e.target.value)}
         />
-        <Input
+        <MonthInput
           label="За какой месяц"
           required
-          type="month"
           value={month}
           error={errors.month}
-          onChange={(e) => setMonth(e.target.value)}
+          onChange={setMonth}
         />
         <FullRow>
           <Select

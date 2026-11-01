@@ -5,6 +5,7 @@ import Alert from "@/components/ui/alert/Alert";
 import Badge from "@/components/ui/badge/Badge";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
+import DateInput from "@/components/ui/date-input/DateInput";
 import { FormActions, FormGrid, FormSection, FullRow } from "@/components/ui/form-layout/FormLayout";
 import { contractsApi } from "@/lib/api";
 import type { AcademicLeave, Contract } from "@/lib/api/types";
@@ -104,8 +105,8 @@ const LeaveManager = ({ contract, onChanged }: LeaveManagerProps) => {
       <form onSubmit={handleAdd} noValidate>
         <FormSection title="Оформить отпуск">
           <FormGrid>
-            <Input label="С" type="date" required value={start} error={errors.start} onChange={(e) => setStart(e.target.value)} />
-            <Input label="По" type="date" required value={end} error={errors.end} onChange={(e) => setEnd(e.target.value)} />
+            <DateInput label="С" required value={start} error={errors.start} onChange={setStart} />
+            <DateInput label="По" required value={end} error={errors.end} onChange={setEnd} />
             <FullRow>
               <Input label="Причина" placeholder="По заявлению студента" value={reason} onChange={(e) => setReason(e.target.value)} />
             </FullRow>

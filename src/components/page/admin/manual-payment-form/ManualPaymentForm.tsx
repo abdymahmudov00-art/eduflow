@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Alert from "@/components/ui/alert/Alert";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
+import MonthInput from "@/components/ui/month-input/MonthInput";
 import Select from "@/components/ui/select/Select";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import type { Contract, PaymentCreate } from "@/lib/api/types";
@@ -70,7 +71,7 @@ const ManualPaymentForm = ({ contract, month: initialMonth, onSubmit, onCancel }
             hint={`В месяц по контракту: ${formatMoney(contract.monthly_payment)}`}
             onChange={(e) => setAmount(e.target.value)}
           />
-          <Input label="За месяц" required type="month" value={month} onChange={(e) => setMonth(e.target.value)} />
+          <MonthInput label="За месяц" required value={month} onChange={setMonth} />
           <FullRow>
             <Select label="Способ оплаты" options={PAYMENT_METHODS} value={method} onChange={(e) => setMethod(e.target.value)} />
           </FullRow>

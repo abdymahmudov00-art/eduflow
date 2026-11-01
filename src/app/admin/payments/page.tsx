@@ -11,7 +11,7 @@ import ConfirmDialog from "@/components/ui/confirm-dialog/ConfirmDialog";
 import InfoList from "@/components/page/shared/info-list/InfoList";
 import PageHeader from "@/components/ui/page-header/PageHeader";
 import ActionMenu from "@/components/ui/action-menu/ActionMenu";
-import Select from "@/components/ui/select/Select";
+import Combobox from "@/components/ui/combobox/Combobox";
 import StatusBadge from "@/components/ui/status-badge/StatusBadge";
 import Table from "@/components/ui/table/Table";
 import Tabs from "@/components/ui/tabs/Tabs";
@@ -207,14 +207,16 @@ export default function AdminPaymentsPage() {
           (selected ? (
             <div className={styles.stack}>
               <div className={styles.contractBar}>
-                <Select
+                <Combobox
                   label="Студент и контракт"
+                  placeholder="Введите имя студента"
                   options={contracts.map((c) => ({
                     value: String(c.id),
-                    label: `${studentNameForContract(c.id)} · контракт №${c.id}`,
+                    label: studentNameForContract(c.id),
+                    hint: `контракт №${c.id}`,
                   }))}
                   value={String(selected.id)}
-                  onChange={(e) => setContractId(Number(e.target.value))}
+                  onChange={(v) => setContractId(Number(v))}
                 />
               </div>
 

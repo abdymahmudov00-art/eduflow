@@ -1,0 +1,100 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+.note {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.day {
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-muted);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.day:hover {
+  transform: none;
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.day:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.on,
+.on:hover {
+  color: #fff;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset,
+.clear {
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted);
+  background: transparent;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.preset:hover,
+.clear:hover {
+  transform: none;
+  color: var(--color-text);
+}
+
+.presetOn {
+  color: var(--color-primary-text);
+  border-style: solid;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: var(--color-primary-soft);
+}
+
+.clear {
+  border-color: transparent;
+}
+
+.error {
+  font-size: 12px;
+  color: var(--color-danger);
+}
