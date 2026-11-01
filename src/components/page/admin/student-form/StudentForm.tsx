@@ -6,15 +6,9 @@ import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
 import Select from "@/components/ui/select/Select";
 import { FormActions, FormGrid, FormSection } from "@/components/ui/form-layout/FormLayout";
-import PersonalInfoFields, {
-  EMPTY_PERSONAL_INFO,
-  toPersonalInfoInput,
-  validatePersonalInfo,
-  type PersonalInfoErrors,
-  type PersonalInfoValues,
-} from "@/components/page/shared/personal-info-fields/PersonalInfoFields";
 import type { Group, StudentCreate } from "@/lib/api/types";
 import { getErrorMessage } from "@/lib/errors";
+import styles from "./student-form.module.css";
 
 interface StudentFormProps {
   groups: Group[];
@@ -33,9 +27,7 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
   const [password, setPassword] = useState("");
   const [studentNumber, setStudentNumber] = useState("");
   const [groupId, setGroupId] = useState("");
-  const [info, setInfo] = useState<PersonalInfoValues>(EMPTY_PERSONAL_INFO);
   const [accountErrors, setAccountErrors] = useState<AccountErrors>({});
-  const [infoErrors, setInfoErrors] = useState<PersonalInfoErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -45,10 +37,8 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
     if (password.length < 8 || password.length > 128) next.password = "От 8 до 128 символов";
     if (!studentNumber.trim()) next.student_number = "Укажите номер";
     else if (studentNumber.length > 30) next.student_number = "Не больше 30 символов";
-    const nextInfo = validatePersonalInfo(info);
     setAccountErrors(next);
-    setInfoErrors(nextInfo);
-    return Object.keys(next).length === 0 && Object.keys(nextInfo).length === 0;
+    return Object.keys(next).length === 0;
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -62,7 +52,6 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
         password,
         student_number: studentNumber.trim(),
         group_id: groupId ? Number(groupId) : null,
-        personal_info: toPersonalInfoInput(info),
       });
     } catch (err) {
       setServerError(getErrorMessage(err));
@@ -83,7 +72,7 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
             autoComplete="off"
             value={username}
             error={accountErrors.username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => { setUsername(e.target.value); setAccountErrors((p) => ({ ...p, username: undefined })); }}
           />
           <Input
             label="Пароль"
@@ -92,7 +81,7 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
             autoComplete="new-password"
             value={password}
             error={accountErrors.password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setAccountErrors((p) => ({ ...p, password: undefined })); }}
           />
           <Input
             label="Номер студента"
@@ -100,7 +89,7 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
             placeholder="ST-2026-01"
             value={studentNumber}
             error={accountErrors.student_number}
-            onChange={(e) => setStudentNumber(e.target.value)}
+            onChange={(e) => { setStudentNumber(e.target.value); setAccountErrors((p) => ({ ...p, student_number: undefined })); }}
           />
           <Select
             label="Группа"
@@ -113,16 +102,10 @@ const StudentForm = ({ groups, onSubmit, onCancel }: StudentFormProps) => {
         </FormGrid>
       </FormSection>
 
-      <FormSection title="Личные данные">
-        <PersonalInfoFields
-          values={info}
-          errors={infoErrors}
-          onChange={(field, value) => {
-            setInfo((prev) => ({ ...prev, [field]: value }));
-            setInfoErrors((prev) => ({ ...prev, [field]: undefined }));
-          }}
-        />
-      </FormSection>
+      <p className={styles.note}>
+        Личные данные студент заполнит сам в разделе «Личная информация». Анкета придёт вам на
+        проверку во вкладку «Анкеты на проверке».
+      </p>
 
       <FormActions>
         <Button variant="secondary" onClick={onCancel} disabled={submitting}>
