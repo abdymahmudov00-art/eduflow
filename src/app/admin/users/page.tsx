@@ -11,14 +11,23 @@ import Modal from "@/components/ui/modal/Modal";
 import PageHeader from "@/components/ui/page-header/PageHeader";
 import ActionMenu from "@/components/ui/action-menu/ActionMenu";
 import Table from "@/components/ui/table/Table";
+import Tabs from "@/components/ui/tabs/Tabs";
 import { usersApi } from "@/lib/api";
 import type { User } from "@/lib/api/types";
 import { getErrorMessage } from "@/lib/errors";
 import { useFetch } from "@/lib/hooks/useFetch";
 import styles from "../admin.module.css";
 
+type Filter = "admin" | "student";
+
+const EMPTY_TEXT: Record<Filter, string> = {
+  admin: "Администраторов нет",
+  student: "Пользователей пока нет",
+};
+
 export default function UsersPage() {
   const { data, loading, error, reload } = useFetch(usersApi.list);
+  const [filter, setFilter] = useState<Filter>("admin");
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
   const [deleting, setDeleting] = useState<User | null>(null);
@@ -44,39 +53,6 @@ export default function UsersPage() {
   const admins = (data ?? []).filter((u) => u.role === "admin").sort(byId);
   const students = (data ?? []).filter((u) => u.role !== "admin").sort(byId);
 
-  /** Таблица одного списка: роль не показываем — она понятна из заголовка */
-  const renderTable = (rows: User[], emptyText: string) => (
-    <Table<User>
-      rows={rows}
-      rowKey={(u) => u.id}
-      emptyText={emptyText}
-      columns={[
-        { key: "id", header: "ID", width: 60, render: (u) => u.id },
-        { key: "username", header: "Логин", render: (u) => u.username },
-        {
-          key: "active",
-          header: "Статус",
-          render: (u) =>
-            u.is_active ? <Badge tone="success">Активен</Badge> : <Badge tone="neutral">Отключён</Badge>,
-        },
-        {
-          key: "actions",
-          header: "",
-          width: 56,
-          align: "right",
-          render: (u) => (
-            <ActionMenu
-              items={[
-                { label: "Изменить", icon: "edit", onClick: () => setEditing(u) },
-                { label: "Удалить", icon: "trash", danger: true, onClick: () => setDeleting(u) },
-              ]}
-            />
-          ),
-        },
-      ]}
-    />
-  );
-
   return (
     <>
       <PageHeader
@@ -92,20 +68,43 @@ export default function UsersPage() {
       )}
 
       <AsyncState loading={loading} error={error} onRetry={reload}>
-        <div className={styles.stack}>
-          <section>
-            <h2 className={styles.listTitle}>
-              Администраторы <span className={styles.listCount}>{admins.length}</span>
-            </h2>
-            {renderTable(admins, "Администраторов нет")}
-          </section>
-          <section>
-            <h2 className={styles.listTitle}>
-              Студенты <span className={styles.listCount}>{students.length}</span>
-            </h2>
-            {renderTable(students, "Аккаунтов студентов пока нет")}
-          </section>
-        </div>
+        <Tabs<Filter>
+          value={filter}
+          onChange={setFilter}
+          items={[
+            { value: "admin", label: "Администраторы", count: admins.length },
+            { value: "student", label: "Пользователи", count: students.length },
+          ]}
+        />
+        <Table<User>
+          rows={filter === "admin" ? admins : students}
+          rowKey={(u) => u.id}
+          emptyText={EMPTY_TEXT[filter]}
+          columns={[
+            { key: "id", header: "ID", width: 60, render: (u) => u.id },
+            { key: "username", header: "Логин", render: (u) => u.username },
+            {
+              key: "active",
+              header: "Статус",
+              render: (u) =>
+                u.is_active ? <Badge tone="success">Активен</Badge> : <Badge tone="neutral">Отключён</Badge>,
+            },
+            {
+              key: "actions",
+              header: "",
+              width: 56,
+              align: "right",
+              render: (u) => (
+                <ActionMenu
+                  items={[
+                    { label: "Изменить", icon: "edit", onClick: () => setEditing(u) },
+                    { label: "Удалить", icon: "trash", danger: true, onClick: () => setDeleting(u) },
+                  ]}
+                />
+              ),
+            },
+          ]}
+        />
       </AsyncState>
 
       <Modal open={creating} title="Новый пользователь" onClose={() => setCreating(false)}>
