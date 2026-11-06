@@ -157,22 +157,3 @@
   flex-wrap: wrap;
   gap: 6px;
 }
-
-/* Заголовок списка на странице «Пользователи»: «Администраторы 1», «Студенты 10» */
-.listTitle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.listCount {
-  padding: 2px 9px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--color-muted);
-  background: var(--color-surface-2);
-  border-radius: 999px;
-}

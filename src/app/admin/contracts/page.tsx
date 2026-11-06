@@ -19,6 +19,7 @@ import type { Contract, ContractStatus } from "@/lib/api/types";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate, formatMoney, fullName } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
+import { CONTRACT_TYPE_LABELS } from "@/lib/labels";
 import { activeLeaves } from "@/lib/contract";
 import styles from "../admin.module.css";
 
@@ -101,6 +102,7 @@ export default function ContractsPage() {
             { key: "monthly", header: "В месяц", align: "right", render: (c) => formatMoney(c.monthly_payment) },
             { key: "months", header: "Мес.", align: "right", render: (c) => c.duration_months },
             { key: "start", header: "Начало", render: (c) => formatDate(c.start_date) },
+            { key: "type", header: "Тип", render: (c) => CONTRACT_TYPE_LABELS[c.type] ?? "—" },
             { key: "day", header: "День оплаты", align: "right", render: (c) => (c.payment_day ? `${c.payment_day}-е` : "—") },
             {
               key: "status",

@@ -158,6 +158,9 @@ export interface AcademicLeaveInput {
   reason?: string | null;
 }
 
+/** academy — платёж привязан к месяцу; college — месяц не обязателен */
+export type ContractType = "academy" | "college";
+
 export interface Contract {
   id: number;
   student_id: number;
@@ -170,6 +173,7 @@ export interface Contract {
   /** День месяца, до которого нужно платить */
   payment_day: number | null;
   academic_leaves: AcademicLeave[];
+  type: ContractType;
 }
 
 export interface ContractInput {
@@ -179,6 +183,7 @@ export interface ContractInput {
   duration_months: number;
   start_date: string;
   payment_day?: number | null;
+  type?: ContractType;
 }
 
 export interface Payment {
@@ -192,7 +197,7 @@ export interface Payment {
   created_at: string;
   paid_at: string | null;
   confirmed_by_admin_id: number | null;
-  payment_month: string;
+  payment_month: string | null;
 }
 
 /** request_id можно не передавать — paymentsApi.create сгенерирует его сам */
@@ -201,8 +206,8 @@ export interface PaymentCreate {
   contract_id: number;
   amount: Money;
   payment_method?: string | null;
-  /** Формат "YYYY-MM" */
-  payment_month: string;
+  /** Формат "YYYY-MM". Обязателен для «Академии», для «Колледжа» — null */
+  payment_month?: string | null;
 }
 
 /** Ответ /payments/my/balance — суммы приходят числами */
@@ -214,6 +219,51 @@ export interface Balance {
   remaining_amount: Money;
   paid_months: number;
   duration_months: number;
+  /** Сколько месяцев просрочено и на какую сумму (новые поля бэкенда, могут отсутствовать) */
+  overdue_months?: number;
+  overdue_amount?: Money;
+  /** Следующий платёж: дата (YYYY-MM-DD) и сумма */
+  next_due_date?: string | null;
+  next_due_amount?: Money | null;
+}
+
+/** POST /finik/payments: онлайн-оплата по QR через Finik */
+export interface FinikPaymentCreate {
+  request_id?: string;
+  contract_id: number;
+  amount: Money;
+  /** Обязателен для контрактов «Академия», для «Колледжа» можно не передавать */
+  payment_month?: string | null;
+}
+
+/** Ответ Finik-эндпоинтов. Статус бэкенд может прислать в любом регистре (PENDING / pending) */
+export interface FinikPayment {
+  payment_id: number;
+  status: string;
+  payment_url?: string | null;
+}
+
+/** GET /finik/transactions (админ) */
+export interface FinikTransaction {
+  id: number;
+  payment_id: number;
+  provider_payment_id: string;
+  provider_transaction_id: string | null;
+  provider_operation_id: string | null;
+  status: string;
+  payment_url: string | null;
+  review_reason: string | null;
+  resolved_by_admin_id: number | null;
+  resolved_at: string | null;
+  admin_comment: string | null;
+  created_at: string;
+  confirmed_at: string | null;
+}
+
+export interface FinikResolve {
+  action: "confirm" | "reject";
+  provider_transaction_id?: string | null;
+  comment?: string | null;
 }
 
 export interface Me {

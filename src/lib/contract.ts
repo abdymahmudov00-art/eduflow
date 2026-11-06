@@ -56,12 +56,26 @@ function leaveFor(contract: Contract, key: string): AcademicLeave | null {
 /** Округление до копеек, чтобы 0.1 + 0.2 не давало «недоплату» */
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+/** Онлайн-оплата через Finik (подтверждается автоматически, админ её не проверяет) */
+export const isOnlinePayment = (p: Payment) => (p.payment_method ?? "").toLowerCase() === "finik";
+
+/**
+ * Платёж ждёт проверки администратора.
+ * Незавершённые онлайн-оплаты сюда не входят: студент мог закрыть страницу оплаты
+ * и не заплатить — такой платёж не должен «занимать» месяц.
+ */
+export const isAwaitingReview = (p: Payment) => p.status === "pending" && !isOnlinePayment(p);
+
 const sumOf = (payments: Payment[], status: Payment["status"]) =>
-  round2(payments.filter((p) => p.status === status).reduce((sum, p) => sum + toNumber(p.amount), 0));
+  round2(
+    payments
+      .filter((p) => (status === "pending" ? isAwaitingReview(p) : p.status === status))
+      .reduce((sum, p) => sum + toNumber(p.amount), 0),
+  );
 
 function statusFor(payments: Payment[], leave: AcademicLeave | null, paid: number, due: number): MonthStatus {
   if (paid > 0 && paid >= due) return "paid";
-  if (payments.some((p) => p.status === "pending")) return "pending";
+  if (payments.some(isAwaitingReview)) return "pending";
   if (paid > 0) return "partial";
   if (leave) return "leave";
   if (payments.some((p) => p.status === "rejected")) return "rejected";

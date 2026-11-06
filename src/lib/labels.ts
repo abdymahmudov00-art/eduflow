@@ -1,4 +1,4 @@
-import type { ContractStatus, GroupHistoryKind, PaymentStatus, PersonalInfoStatus, UserRole, Weekday } from "@/lib/api/types";
+import type { ContractStatus, ContractType, GroupHistoryKind, PaymentStatus, PersonalInfoStatus, UserRole, Weekday } from "@/lib/api/types";
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: "Администратор",
@@ -17,6 +17,32 @@ export const CONTRACT_STATUS_LABELS: Record<ContractStatus, string> = {
   cancelled: "Отменён",
 };
 
+export const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
+  academy: "Академия",
+  college: "Колледж",
+};
+
+/** Статусы транзакций Finik. Неизвестный статус показываем как есть */
+export const FINIK_STATUS_LABELS: Record<string, string> = {
+  pending: "Ожидает оплаты",
+  created: "Создан",
+  processing: "В обработке",
+  confirmed: "Оплачен",
+  succeeded: "Оплачен",
+  success: "Оплачен",
+  rejected: "Отклонён",
+  failed: "Ошибка",
+  expired: "Истёк",
+  cancelled: "Отменён",
+  review: "Нужна проверка",
+  needs_review: "Нужна проверка",
+  disputed: "Спорный",
+};
+
+export function finikStatusLabel(status: string) {
+  return FINIK_STATUS_LABELS[status.toLowerCase()] ?? status;
+}
+
 export const PAYMENT_METHODS = [
   { value: "card", label: "Банковская карта" },
   { value: "transfer", label: "Перевод" },
@@ -25,6 +51,7 @@ export const PAYMENT_METHODS = [
 
 export function paymentMethodLabel(value: string | null | undefined) {
   if (!value) return "—";
+  if (value.toLowerCase() === "finik") return "Онлайн (Finik)";
   return PAYMENT_METHODS.find((m) => m.value === value)?.label ?? value;
 }
 

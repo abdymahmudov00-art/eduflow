@@ -39,8 +39,10 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
   const [submitting, setSubmitting] = useState(false);
   const [requestId, setRequestId] = useState(uuid4);
 
-  const monthInfo = months.find((m) => m.key === month);
-  const blockReason = monthBlockReason(monthInfo);
+  // «Колледж»: оплата идёт в общий баланс, месяц не выбираем
+  const isCollege = contract.type === "college";
+  const monthInfo = isCollege ? undefined : months.find((m) => m.key === month);
+  const blockReason = isCollege ? null : monthBlockReason(monthInfo);
 
   const handleMonthChange = (key: string) => {
     setMonth(key);
@@ -69,7 +71,7 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
         request_id: requestId,
         contract_id: contract.id,
         amount: amount.replace(",", "."),
-        payment_month: month,
+        payment_month: isCollege ? null : month,
         payment_method: method,
       });
     } catch (err) {
@@ -96,14 +98,16 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
       )}
       <div style={{ marginTop: 16 }}>
         <FormGrid>
-          <MonthInput
-            label="За месяц"
-            required
-            value={month}
-            error={blockReason ?? undefined}
-            hint={monthHint}
-            onChange={handleMonthChange}
-          />
+          {!isCollege && (
+            <MonthInput
+              label="За месяц"
+              required
+              value={month}
+              error={blockReason ?? undefined}
+              hint={monthHint}
+              onChange={handleMonthChange}
+            />
+          )}
           <Input
             label="Сумма"
             required

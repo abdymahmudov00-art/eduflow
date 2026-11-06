@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import FinikTransactions from "@/components/page/admin/finik-transactions/FinikTransactions";
 import ManualPaymentForm from "@/components/page/admin/manual-payment-form/ManualPaymentForm";
 import MonthTimeline from "@/components/page/shared/month-timeline/MonthTimeline";
 import Modal from "@/components/ui/modal/Modal";
@@ -16,16 +17,24 @@ import StatusBadge from "@/components/ui/status-badge/StatusBadge";
 import Table from "@/components/ui/table/Table";
 import Tabs from "@/components/ui/tabs/Tabs";
 import Card from "@/components/ui/card/Card";
+import Badge from "@/components/ui/badge/Badge";
 import { contractsApi, paymentsApi, studentsApi } from "@/lib/api";
 import type { Payment, PaymentStatus } from "@/lib/api/types";
-import { buildContractMonths, contractEndMonth, contractStartMonth, isMonthOpen } from "@/lib/contract";
+import {
+  buildContractMonths,
+  contractEndMonth,
+  contractStartMonth,
+  isAwaitingReview,
+  isMonthOpen,
+  isOnlinePayment,
+} from "@/lib/contract";
 import { getErrorMessage, isConflict } from "@/lib/errors";
 import { formatDateTime, formatMoney, formatMonth, fullName, toNumber } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
 import { paymentMethodLabel } from "@/lib/labels";
 import styles from "../admin.module.css";
 
-type View = "queue" | "contract";
+type View = "queue" | "contract" | "finik";
 type Filter = PaymentStatus | "all";
 
 async function loadPayments() {
@@ -61,16 +70,26 @@ export default function AdminPaymentsPage() {
     return contract ? fullName(studentById.get(contract.student_id)?.personal_info) : "—";
   };
 
-  const rows = filter === "all" ? payments : payments.filter((p) => p.status === filter);
-  const count = (status: PaymentStatus) => payments.filter((p) => p.status === status).length;
+  // «На проверке» — только то, что должен проверить админ. Незавершённые онлайн-оплаты Finik
+  // подтверждаются автоматически, их видно во «Все» и во вкладке «Онлайн (Finik)»
+  const matches = (p: Payment, status: PaymentStatus) => (status === "pending" ? isAwaitingReview(p) : p.status === status);
+  const studentNameForPayment = (paymentId: number) => {
+    const payment = payments.find((p) => p.id === paymentId);
+    return payment ? studentNameForContract(payment.contract_id) : "—";
+  };
+  const rows = filter === "all" ? payments : payments.filter((p) => matches(p, filter));
+  const count = (status: PaymentStatus) => payments.filter((p) => matches(p, status)).length;
 
   // Вкладка «По контракту»
   const selected = contracts.find((c) => c.id === contractId) ?? contracts[0];
-  const months = selected ? buildContractMonths(selected, payments) : [];
+  const isCollege = selected?.type === "college";
+  const months = selected && !isCollege ? buildContractMonths(selected, payments) : [];
   const paidMonths = months.filter((m) => m.status === "paid").length;
-  const outOfSchedule = selected
-    ? payments.filter((p) => p.contract_id === selected.id && !months.some((m) => m.key === p.payment_month))
-    : [];
+  const selectedPayments = selected ? payments.filter((p) => p.contract_id === selected.id) : [];
+  const confirmedTotal = isCollege
+    ? selectedPayments.filter((p) => p.status === "confirmed").reduce((sum, p) => sum + toNumber(p.amount), 0)
+    : months.reduce((sum, m) => sum + m.paidAmount, 0);
+  const outOfSchedule = isCollege ? [] : selectedPayments.filter((p) => !months.some((m) => m.key === p.payment_month));
 
   const changeStatus = async (payment: Payment, status: "confirmed" | "rejected") => {
     setBusyId(payment.id);
@@ -118,7 +137,7 @@ export default function AdminPaymentsPage() {
       <PageHeader
         kicker="Платежи"
         title="Подтверждение оплат"
-        description="Студент сообщает об оплате — вы подтверждаете. Оплату наличными можно отметить самому во вкладке «По контракту»."
+        description="Онлайн-оплаты (Finik) подтверждаются автоматически. Оплату наличными или переводом студент сообщает — вы подтверждаете. Наличные можно отметить самому во вкладке «По контракту»."
       />
 
       {(actionError || notice) && (
@@ -139,6 +158,7 @@ export default function AdminPaymentsPage() {
           items={[
             { value: "queue", label: "Очередь проверки", count: count("pending") },
             { value: "contract", label: "По контракту" },
+            { value: "finik", label: "Онлайн (Finik)" },
           ]}
         />
 
@@ -166,7 +186,16 @@ export default function AdminPaymentsPage() {
                 { key: "amount", header: "Сумма", align: "right", render: (p) => formatMoney(p.amount) },
                 { key: "method", header: "Способ", render: (p) => paymentMethodLabel(p.payment_method) },
                 { key: "created", header: "Создан", render: (p) => formatDateTime(p.created_at) },
-                { key: "status", header: "Статус", render: (p) => <StatusBadge kind="payment" status={p.status} /> },
+                {
+                  key: "status",
+                  header: "Статус",
+                  render: (p) =>
+                    isOnlinePayment(p) && p.status === "pending" ? (
+                      <Badge tone="neutral">Ждёт оплаты</Badge>
+                    ) : (
+                      <StatusBadge kind="payment" status={p.status} />
+                    ),
+                },
                 {
                   key: "actions",
                   header: "",
@@ -178,14 +207,14 @@ export default function AdminPaymentsPage() {
                         {
                           label: "Подтвердить оплату",
                           icon: "check",
-                          hidden: p.status !== "pending",
+                          hidden: !isAwaitingReview(p),
                           disabled: busyId === p.id,
                           onClick: () => changeStatus(p, "confirmed"),
                         },
                         {
                           label: "Отклонить",
                           icon: "close",
-                          hidden: p.status !== "pending",
+                          hidden: !isAwaitingReview(p),
                           disabled: busyId === p.id,
                           onClick: () => changeStatus(p, "rejected"),
                         },
@@ -227,11 +256,10 @@ export default function AdminPaymentsPage() {
                   <InfoList
                     rows={[
                       { label: "Статус", value: <StatusBadge kind="contract" status={selected.status} /> },
-                      { label: "Оплачено месяцев", value: `${paidMonths} из ${selected.duration_months}` },
-                      {
-                        label: "Подтверждено",
-                        value: formatMoney(months.reduce((sum, m) => sum + m.paidAmount, 0)),
-                      },
+                      isCollege
+                        ? { label: "Тип", value: "Колледж — без привязки к месяцам" }
+                        : { label: "Оплачено месяцев", value: `${paidMonths} из ${selected.duration_months}` },
+                      { label: "Подтверждено", value: formatMoney(confirmedTotal) },
                       { label: "Сумма контракта", value: formatMoney(selected.total_amount) },
                     ]}
                   />
@@ -245,10 +273,7 @@ export default function AdminPaymentsPage() {
                       {
                         label: "Осталось",
                         value: formatMoney(
-                          Math.max(
-                            toNumber(selected.total_amount) - months.reduce((sum, m) => sum + m.paidAmount, 0),
-                            0,
-                          ),
+                          Math.max(toNumber(selected.total_amount) - confirmedTotal, 0),
                         ),
                       },
                     ]}
@@ -256,10 +281,41 @@ export default function AdminPaymentsPage() {
                 </Card>
               </div>
 
+              {isCollege ? (
+                <Card
+                  title="Платежи по контракту"
+                  actions={
+                    selected.status === "active" ? (
+                      <Button variant="secondary" size="sm" icon="plus" onClick={() => setManualMonth("")}>
+                        Отметить оплату
+                      </Button>
+                    ) : undefined
+                  }
+                >
+                  <Table<Payment>
+                    rows={selectedPayments}
+                    rowKey={(p) => p.id}
+                    emptyText="Платежей по контракту ещё нет"
+                    columns={[
+                      { key: "amount", header: "Сумма", align: "right", render: (p) => formatMoney(p.amount) },
+                      { key: "method", header: "Способ", render: (p) => paymentMethodLabel(p.payment_method) },
+                      { key: "created", header: "Создан", render: (p) => formatDateTime(p.created_at) },
+                      { key: "status", header: "Статус", render: (p) => <StatusBadge kind="payment" status={p.status} /> },
+                      {
+                        key: "actions",
+                        header: "",
+                        align: "right",
+                        render: (p) =>
+                          isAwaitingReview(p) ? <div className={styles.monthButtons}>{decisionButtons(p)}</div> : null,
+                      },
+                    ]}
+                  />
+                </Card>
+              ) : (
               <MonthTimeline
                 months={months}
                 renderActions={(month) => {
-                  const pending = month.payments.filter((p) => p.status === "pending");
+                  const pending = month.payments.filter(isAwaitingReview);
                   if (pending.length > 0) {
                     return pending.map((p) => (
                       <div key={p.id} className={styles.monthDecision}>
@@ -278,6 +334,7 @@ export default function AdminPaymentsPage() {
                   return null;
                 }}
               />
+              )}
 
               {outOfSchedule.length > 0 && (
                 <Alert tone="info">
@@ -290,14 +347,16 @@ export default function AdminPaymentsPage() {
           ) : (
             <Alert tone="info">Контрактов пока нет. Создайте их в разделе «Контракты».</Alert>
           ))}
+
+        {view === "finik" && <FinikTransactions studentNameForPayment={studentNameForPayment} onChanged={reload} />}
       </AsyncState>
 
       <Modal
         open={manualMonth !== null && selected !== undefined}
-        title={manualMonth ? `Оплата за ${formatMonth(manualMonth)}` : ""}
+        title={manualMonth ? `Оплата за ${formatMonth(manualMonth)}` : "Отметить оплату"}
         onClose={() => setManualMonth(null)}
       >
-        {manualMonth && selected && (
+        {manualMonth !== null && selected && (
           <ManualPaymentForm
             contract={selected}
             months={months}
@@ -311,7 +370,7 @@ export default function AdminPaymentsPage() {
                 throw err;
               }
               setManualMonth(null);
-              setNotice(`Оплата за ${formatMonth(values.payment_month)} отмечена`);
+              setNotice(values.payment_month ? `Оплата за ${formatMonth(values.payment_month)} отмечена` : "Оплата отмечена");
               reload();
             }}
           />

@@ -6,10 +6,17 @@ import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
 import DateInput from "@/components/ui/date-input/DateInput";
 import Combobox from "@/components/ui/combobox/Combobox";
+import Select from "@/components/ui/select/Select";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
-import type { Contract, ContractInput, Student } from "@/lib/api/types";
+import type { Contract, ContractInput, ContractType, Student } from "@/lib/api/types";
 import { getErrorMessage } from "@/lib/errors";
 import { formatMoney, fullName, toNumber } from "@/lib/format";
+import { CONTRACT_TYPE_LABELS } from "@/lib/labels";
+
+const TYPE_OPTIONS = (Object.keys(CONTRACT_TYPE_LABELS) as ContractType[]).map((value) => ({
+  value,
+  label: CONTRACT_TYPE_LABELS[value],
+}));
 
 interface ContractFormProps {
   contract?: Contract;
@@ -32,6 +39,7 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
   const [monthly, setMonthly] = useState(trimZeros(contract?.monthly_payment));
   const [duration, setDuration] = useState(contract ? String(contract.duration_months) : "");
   const [startDate, setStartDate] = useState(contract?.start_date ?? "");
+  const [type, setType] = useState<ContractType>(contract?.type ?? "academy");
   const [paymentDay, setPaymentDay] = useState(contract?.payment_day ? String(contract.payment_day) : "");
   const [errors, setErrors] = useState<Errors>({});
   const [serverError, setServerError] = useState<string | null>(null);
@@ -69,6 +77,7 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
         duration_months: Number(duration),
         start_date: startDate,
         payment_day: paymentDay ? Number(paymentDay) : null,
+        type,
       });
     } catch (err) {
       setServerError(getErrorMessage(err));
@@ -98,6 +107,19 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
             value={studentId}
             error={errors.student_id}
             onChange={setStudentId}
+          />
+        </FullRow>
+        <FullRow>
+          <Select
+            label="Тип контракта"
+            options={TYPE_OPTIONS}
+            value={type}
+            onChange={(e) => setType(e.target.value as ContractType)}
+            hint={
+              type === "academy"
+                ? "Каждый платёж привязан к месяцу — видно, какие месяцы оплачены"
+                : "Платежи идут в общий баланс, месяц указывать не обязательно"
+            }
           />
         </FullRow>
         <Input
