@@ -8,23 +8,18 @@ import MonthInput from "@/components/ui/month-input/MonthInput";
 import Select from "@/components/ui/select/Select";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import { uuid4 } from "@/lib/api/payments";
-import Tabs from "@/components/ui/tabs/Tabs";
 import type { Balance, Contract, Payment, PaymentCreate } from "@/lib/api/types";
 import { buildContractMonths, firstOpenMonth, monthBlockReason } from "@/lib/contract";
 import { getErrorMessage, isFinalError } from "@/lib/errors";
 import { currentMonth, formatMoney, toNumber } from "@/lib/format";
-import { PAYMENT_METHODS } from "@/lib/labels";
-
-/** online — оплата через Finik (QR / приложение банка), manual — сообщить о уже сделанной оплате */
-export type PaymentMode = "online" | "manual";
 
 interface PaymentFormProps {
   contracts: Contract[];
   balances: Balance[];
   /** Все платежи студента — по ним считаем, сколько осталось за каждый месяц */
   payments: Payment[];
-  /** mode — как платит студент: онлайн через Finik или сообщает о сделанной оплате */
-  onSubmit: (data: PaymentCreate, mode: PaymentMode) => Promise<void>;
+  /** Создать оплату через Finik (QR). Платёж станет оплаченным только после подтверждения от Finik */
+  onSubmit: (data: PaymentCreate) => Promise<void>;
   onCancel: () => void;
   /** Контракт, выбранный по умолчанию */
   defaultContractId?: number;
@@ -56,8 +51,6 @@ const PaymentForm = ({
   const [amount, setAmount] = useState(
     startRemaining ? amountText(startRemaining) : first ? amountText(toNumber(first.monthly_payment)) : "",
   );
-  const [mode, setMode] = useState<PaymentMode>("online");
-  const [method, setMethod] = useState(PAYMENT_METHODS[0].value);
   const [errors, setErrors] = useState<{ contract?: string; amount?: string; month?: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -116,16 +109,12 @@ const PaymentForm = ({
     setSubmitting(true);
     setServerError(null);
     try {
-      await onSubmit(
-        {
-          request_id: requestId,
-          contract_id: Number(contractId),
-          amount: amount.replace(",", "."),
-          payment_method: mode === "online" ? "finik" : method,
-          payment_month: isCollege ? null : month,
-        },
-        mode,
-      );
+      await onSubmit({
+        request_id: requestId,
+        contract_id: Number(contractId),
+        amount: amount.replace(",", "."),
+        payment_month: isCollege ? null : month,
+      });
     } catch (err) {
       setServerError(getErrorMessage(err));
       // Сервер ответил отказом — следующая попытка будет новым платежом
@@ -149,24 +138,10 @@ const PaymentForm = ({
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <div style={{ marginBottom: 16 }}>
-        <Tabs<PaymentMode>
-          value={mode}
-          onChange={(value) => {
-            setMode(value);
-            setServerError(null);
-          }}
-          items={[
-            { value: "online", label: "Оплатить онлайн" },
-            { value: "manual", label: "Уже оплатил(а)" },
-          ]}
-        />
-        <p style={{ marginTop: 8, fontSize: 13, lineHeight: 1.5, color: "var(--color-muted)" }}>
-          {mode === "online"
-            ? "Оплата по QR-коду или через приложение банка (Finik). Подтвердится автоматически."
-            : "Если вы уже заплатили наличными или переводом — администратор проверит и подтвердит."}
-        </p>
-      </div>
+      <p style={{ marginBottom: 16, fontSize: 13, lineHeight: 1.5, color: "var(--color-muted)" }}>
+        Оплата по QR-коду или через приложение банка (Finik). Платёж засчитается автоматически, как только банк
+        подтвердит оплату.
+      </p>
       {serverError && (
         <div style={{ marginBottom: 16 }}>
           <Alert>{serverError}</Alert>
@@ -215,23 +190,13 @@ const PaymentForm = ({
             setErrors((prev) => ({ ...prev, amount: undefined }));
           }}
         />
-        {mode === "manual" && (
-          <FullRow>
-            <Select
-              label="Способ оплаты"
-              options={PAYMENT_METHODS}
-              value={method}
-              onChange={(e) => setMethod(e.target.value)}
-            />
-          </FullRow>
-        )}
       </FormGrid>
       <FormActions>
         <Button variant="secondary" onClick={onCancel} disabled={submitting}>
           Отмена
         </Button>
         <Button type="submit" loading={submitting} disabled={Boolean(blockReason)}>
-          {mode === "online" ? "Перейти к оплате" : "Отправить на проверку"}
+          Перейти к оплате
         </Button>
       </FormActions>
     </form>

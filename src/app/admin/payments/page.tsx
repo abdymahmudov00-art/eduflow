@@ -51,7 +51,7 @@ async function loadPayments() {
 export default function AdminPaymentsPage() {
   const { data, loading, error, reload } = useFetch(loadPayments);
   const [view, setView] = useState<View>("queue");
-  const [filter, setFilter] = useState<Filter>("pending");
+  const [filter, setFilter] = useState<Filter>("all");
   const [contractId, setContractId] = useState<number | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState<Payment | null>(null);
@@ -70,9 +70,7 @@ export default function AdminPaymentsPage() {
     return contract ? fullName(studentById.get(contract.student_id)?.personal_info) : "—";
   };
 
-  // «На проверке» — только то, что должен проверить админ. Незавершённые онлайн-оплаты Finik
-  // подтверждаются автоматически, их видно во «Все» и во вкладке «Онлайн (Finik)»
-  const matches = (p: Payment, status: PaymentStatus) => (status === "pending" ? isAwaitingReview(p) : p.status === status);
+  const matches = (p: Payment, status: PaymentStatus) => p.status === status;
   const studentNameForPayment = (paymentId: number) => {
     const payment = payments.find((p) => p.id === paymentId);
     return payment ? studentNameForContract(payment.contract_id) : "—";
@@ -136,8 +134,8 @@ export default function AdminPaymentsPage() {
     <>
       <PageHeader
         kicker="Платежи"
-        title="Подтверждение оплат"
-        description="Онлайн-оплаты (Finik) подтверждаются автоматически. Оплату наличными или переводом студент сообщает — вы подтверждаете. Наличные можно отметить самому во вкладке «По контракту»."
+        title="Платежи студентов"
+        description="Студенты платят онлайн через Finik — платёж засчитывается автоматически после подтверждения банка. Оплату наличными отмечаете вы во вкладке «По контракту»."
       />
 
       {(actionError || notice) && (
@@ -156,7 +154,7 @@ export default function AdminPaymentsPage() {
           value={view}
           onChange={setView}
           items={[
-            { value: "queue", label: "Очередь проверки", count: count("pending") },
+            { value: "queue", label: "Все платежи" },
             { value: "contract", label: "По контракту" },
             { value: "finik", label: "Онлайн (Finik)" },
           ]}
@@ -168,7 +166,7 @@ export default function AdminPaymentsPage() {
               value={filter}
               onChange={setFilter}
               items={[
-                { value: "pending", label: "На проверке", count: count("pending") },
+                { value: "pending", label: "Ожидают оплаты", count: count("pending") },
                 { value: "confirmed", label: "Подтверждённые", count: count("confirmed") },
                 { value: "rejected", label: "Отклонённые", count: count("rejected") },
                 { value: "all", label: "Все", count: payments.length },
@@ -177,7 +175,7 @@ export default function AdminPaymentsPage() {
             <Table<Payment>
               rows={rows}
               rowKey={(p) => p.id}
-              emptyText={filter === "pending" ? "Нет платежей на проверке" : "Платежей нет"}
+              emptyText={filter === "pending" ? "Неоплаченных QR нет" : "Платежей нет"}
               columns={[
                 { key: "id", header: "№", width: 60, render: (p) => p.id },
                 { key: "student", header: "Студент", render: (p) => <strong>{studentNameForContract(p.contract_id)}</strong> },
@@ -287,7 +285,7 @@ export default function AdminPaymentsPage() {
                   actions={
                     selected.status === "active" ? (
                       <Button variant="secondary" size="sm" icon="plus" onClick={() => setManualMonth("")}>
-                        Отметить оплату
+                        Оплата наличными
                       </Button>
                     ) : undefined
                   }
@@ -327,7 +325,7 @@ export default function AdminPaymentsPage() {
                   if (isMonthOpen(month) && selected.status === "active") {
                     return (
                       <Button variant="secondary" size="sm" icon="plus" onClick={() => setManualMonth(month.key)}>
-                        {month.status === "partial" ? "Доплата" : "Отметить оплату"}
+                        {month.status === "partial" ? "Доплата наличными" : "Оплата наличными"}
                       </Button>
                     );
                   }
@@ -353,7 +351,7 @@ export default function AdminPaymentsPage() {
 
       <Modal
         open={manualMonth !== null && selected !== undefined}
-        title={manualMonth ? `Оплата за ${formatMonth(manualMonth)}` : "Отметить оплату"}
+        title={manualMonth ? `Наличные за ${formatMonth(manualMonth)}` : "Оплата наличными"}
         onClose={() => setManualMonth(null)}
       >
         {manualMonth !== null && selected && (

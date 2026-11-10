@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MonthTimeline from "@/components/page/shared/month-timeline/MonthTimeline";
 import BalanceCard from "@/components/page/student/balance-card/BalanceCard";
 import GroupPanel from "@/components/page/student/group-panel/GroupPanel";
@@ -17,14 +17,20 @@ import Select from "@/components/ui/select/Select";
 import StatusBadge from "@/components/ui/status-badge/StatusBadge";
 import Table from "@/components/ui/table/Table";
 import GroupHistory from "@/components/page/shared/group-history/GroupHistory";
-import { contractsApi, finikApi, groupsApi, paymentsApi, studentsApi } from "@/lib/api";
+import { contractsApi, finikApi, finikStatus, groupsApi, paymentsApi, studentsApi } from "@/lib/api";
 import type { FinikPayment, Payment } from "@/lib/api/types";
 import { activeLeaves, buildContractMonths, firstOpenMonth, isOnlinePayment } from "@/lib/contract";
-import { isConflict, isNotFound } from "@/lib/errors";
+import { getErrorMessage, isConflict, isNotFound } from "@/lib/errors";
 import { formatDate, formatDateTime, formatMoney, formatMonth } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
 import { paymentMethodLabel } from "@/lib/labels";
 import styles from "../student.module.css";
+
+/** Платёж создан меньше суток назад — QR ещё может быть действителен */
+function isRecent(createdAt: string) {
+  const time = Date.parse(createdAt);
+  return Number.isFinite(time) && Date.now() - time < 24 * 60 * 60 * 1000;
+}
 
 async function loadContract() {
   const [contracts, balances, payments, group, student] = await Promise.all([
@@ -43,15 +49,43 @@ async function loadContract() {
 
 /** Контракт: сводка, помесячная лента оплат и история платежей */
 export default function StudentContractPage() {
-  const { data, loading, error, reload } = useFetch(loadContract);
+  const { data, loading, error, reload, refresh } = useFetch(loadContract);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [paying, setPaying] = useState(false);
   const [success, setSuccess] = useState(false);
   // Онлайн-оплата Finik: созданный платёж и сумма — показываем экран ожидания
   const [checkout, setCheckout] = useState<{ payment: FinikPayment; amount: string } | null>(null);
+  const [resumeError, setResumeError] = useState<string | null>(null);
   const closePayment = () => {
     setPaying(false);
     setCheckout(null);
+  };
+
+  // Неоплаченные QR последних суток: следим за их статусом и обновляем страницу, когда Finik подтвердит
+  const waitingIds = (data?.payments ?? [])
+    .filter((p) => p.status === "pending" && isOnlinePayment(p) && isRecent(p.created_at))
+    .map((p) => p.id)
+    .join(",");
+  useEffect(() => {
+    if (!waitingIds || checkout) return; // экран оплаты сам следит за своим платежом
+    const ids = waitingIds.split(",").map(Number);
+    const timer = setInterval(async () => {
+      const results = await Promise.all(ids.map((id) => finikApi.getPayment(id).catch(() => null)));
+      if (results.some((r) => r && finikStatus(r.status) !== "pending")) refresh();
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [waitingIds, checkout, refresh]);
+
+  /** Вернуться к неоплаченному QR: берём свежую ссылку на оплату */
+  const resumePayment = async (payment: Payment) => {
+    setResumeError(null);
+    try {
+      const fresh = await finikApi.getPayment(payment.id);
+      setCheckout({ payment: fresh, amount: String(payment.amount) });
+      setPaying(true);
+    } catch (err) {
+      setResumeError(getErrorMessage(err));
+    }
   };
 
   const contracts = data?.contracts ?? [];
@@ -72,7 +106,7 @@ export default function StudentContractPage() {
       <PageHeader
         kicker="Контракт"
         title="Оплаты по месяцам"
-        description="Оплатите онлайн по QR-коду — месяц отметится оплаченным автоматически. Оплату наличными или переводом подтверждает администратор."
+        description="Оплата онлайн по QR-коду через Finik. Платёж засчитывается автоматически, когда банк подтвердит оплату. Оплату наличными принимает администратор."
         actions={
           canPay ? (
             <Button icon="wallet" onClick={() => setPaying(true)}>
@@ -85,8 +119,14 @@ export default function StudentContractPage() {
       {success && (
         <div className={styles.note}>
           <Alert tone="success" onClose={() => setSuccess(false)}>
-            Платёж отправлен на проверку. Месяц станет «Оплачено», когда администратор его подтвердит.
+            Оплата подтверждена банком и уже засчитана.
           </Alert>
+        </div>
+      )}
+
+      {resumeError && (
+        <div className={styles.note}>
+          <Alert onClose={() => setResumeError(null)}>{resumeError}</Alert>
         </div>
       )}
 
@@ -149,17 +189,28 @@ export default function StudentContractPage() {
                   { key: "month", header: "Месяц", render: (p) => formatMonth(p.payment_month) },
                   { key: "amount", header: "Сумма", align: "right", render: (p) => formatMoney(p.amount) },
                   { key: "method", header: "Способ", render: (p) => paymentMethodLabel(p.payment_method) },
-                  { key: "created", header: "Отправлен", render: (p) => formatDateTime(p.created_at) },
+                  { key: "created", header: "Создан", render: (p) => formatDateTime(p.created_at) },
                   {
                     key: "status",
                     header: "Статус",
                     render: (p) =>
                       // Онлайн-оплату, которую ещё не завершили, не называем «На проверке»
                       isOnlinePayment(p) && p.status === "pending" ? (
-                        <Badge tone="neutral">Не оплачен</Badge>
+                        <Badge tone="warning">Ожидает оплаты</Badge>
                       ) : (
                         <StatusBadge kind="payment" status={p.status} />
                       ),
+                  },
+                  {
+                    key: "actions",
+                    header: "",
+                    align: "right",
+                    render: (p) =>
+                      p.status === "pending" && isOnlinePayment(p) && isRecent(p.created_at) ? (
+                        <Button size="sm" variant="secondary" onClick={() => resumePayment(p)}>
+                          Оплатить
+                        </Button>
+                      ) : null,
                   },
                 ]}
               />
@@ -173,10 +224,13 @@ export default function StudentContractPage() {
           <FinikCheckout
             payment={checkout.payment}
             amount={checkout.amount}
-            onPaid={reload}
+            onPaid={() => {
+              setSuccess(true);
+              refresh();
+            }}
             onClose={() => {
               closePayment();
-              reload();
+              refresh();
             }}
             onRetry={() => setCheckout(null)}
           />
@@ -188,27 +242,22 @@ export default function StudentContractPage() {
             defaultContractId={contract?.id}
             defaultMonth={firstOpenMonth(months)}
             onCancel={closePayment}
-            onSubmit={async (values, mode) => {
+            onSubmit={async (values) => {
               try {
-                if (mode === "online") {
-                  const payment = await finikApi.createPayment({
-                    request_id: values.request_id,
-                    contract_id: values.contract_id,
-                    amount: values.amount,
-                    payment_month: values.payment_month,
-                  });
-                  setCheckout({ payment, amount: String(values.amount) });
-                  return;
-                }
-                await paymentsApi.create(values);
+                // QR создан, но платёж ещё не оплачен — подтверждение придёт от Finik
+                const payment = await finikApi.createPayment({
+                  request_id: values.request_id,
+                  contract_id: values.contract_id,
+                  amount: values.amount,
+                  payment_month: values.payment_month,
+                });
+                setCheckout({ payment, amount: String(values.amount) });
+                refresh();
               } catch (err) {
                 // 409: месяц уже оплачен или платёж уже есть — подтягиваем свежие данные
-                if (isConflict(err)) reload();
+                if (isConflict(err)) refresh();
                 throw err;
               }
-              closePayment();
-              setSuccess(true);
-              reload();
             }}
           />
         )}

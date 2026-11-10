@@ -5,14 +5,12 @@ import Alert from "@/components/ui/alert/Alert";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
 import MonthInput from "@/components/ui/month-input/MonthInput";
-import Select from "@/components/ui/select/Select";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import { uuid4 } from "@/lib/api/payments";
 import type { Contract, PaymentCreate } from "@/lib/api/types";
 import { monthBlockReason, type ContractMonth } from "@/lib/contract";
 import { getErrorMessage, isFinalError } from "@/lib/errors";
 import { formatMoney, toNumber } from "@/lib/format";
-import { PAYMENT_METHODS } from "@/lib/labels";
 
 interface ManualPaymentFormProps {
   contract: Contract;
@@ -26,14 +24,13 @@ interface ManualPaymentFormProps {
 
 const amountText = (n: number) => String(Math.round(n * 100) / 100);
 
-/** Админ отмечает оплату сам (например, наличными) — платёж сразу подтверждён */
+/** Админ отмечает оплату наличными — платёж сразу подтверждён */
 const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, onCancel }: ManualPaymentFormProps) => {
   const remainingFor = (key: string) => months.find((m) => m.key === key)?.remainingAmount;
   const [month, setMonth] = useState(initialMonth);
   const [amount, setAmount] = useState(() =>
     amountText(remainingFor(initialMonth) || toNumber(contract.monthly_payment)),
   );
-  const [method, setMethod] = useState("cash");
   const [amountError, setAmountError] = useState<string>();
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -72,7 +69,8 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
         contract_id: contract.id,
         amount: amount.replace(",", "."),
         payment_month: isCollege ? null : month,
-        payment_method: method,
+        // Вручную админ отмечает только наличные — онлайн-оплаты приходят через Finik
+        payment_method: "cash",
       });
     } catch (err) {
       setServerError(getErrorMessage(err));
@@ -90,7 +88,9 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <Alert tone="info">Платёж сразу будет подтверждён и попадёт в баланс студента. Можно отметить часть суммы.</Alert>
+      <Alert tone="info">
+        Оплата наличными: платёж сразу будет подтверждён и попадёт в баланс студента. Можно отметить часть суммы.
+      </Alert>
       {serverError && (
         <div style={{ marginTop: 12 }}>
           <Alert>{serverError}</Alert>
@@ -122,9 +122,6 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
               setAmountError(undefined);
             }}
           />
-          <FullRow>
-            <Select label="Способ оплаты" options={PAYMENT_METHODS} value={method} onChange={(e) => setMethod(e.target.value)} />
-          </FullRow>
         </FormGrid>
       </div>
       <FormActions>

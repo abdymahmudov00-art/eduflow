@@ -21,7 +21,13 @@ export function useFetch<T>(fetcher: () => Promise<T>) {
         if (!cancelled) setState({ data, error: null, loading: false });
       })
       .catch((error: unknown) => {
-        if (!cancelled) setState({ data: null, error: getErrorMessage(error), loading: false });
+        // При тихом обновлении не затираем уже показанные данные ошибкой
+        if (!cancelled)
+          setState((prev) =>
+            prev.data !== null && !prev.loading
+              ? prev
+              : { data: null, error: getErrorMessage(error), loading: false },
+          );
       });
     return () => {
       cancelled = true;
@@ -35,5 +41,8 @@ export function useFetch<T>(fetcher: () => Promise<T>) {
     setVersion((v) => v + 1);
   }, []);
 
-  return { ...state, reload };
+  /** Тихо обновить данные — без индикатора загрузки (для автообновления статусов) */
+  const refresh = useCallback(() => setVersion((v) => v + 1), []);
+
+  return { ...state, reload, refresh };
 }

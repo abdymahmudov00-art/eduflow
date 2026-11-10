@@ -57,7 +57,11 @@ function leaveFor(contract: Contract, key: string): AcademicLeave | null {
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /** Онлайн-оплата через Finik (подтверждается автоматически, админ её не проверяет) */
-export const isOnlinePayment = (p: Payment) => (p.payment_method ?? "").toLowerCase() === "finik";
+export const isOnlinePayment = (p: Payment) => {
+  const method = (p.payment_method ?? "").toLowerCase();
+  // Студент теперь платит только через Finik; у старых ручных заявок способ указан (cash, card…)
+  return method === "" || method.includes("finik") || method === "qr" || method === "online";
+};
 
 /**
  * Платёж ждёт проверки администратора.
