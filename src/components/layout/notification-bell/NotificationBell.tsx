@@ -55,11 +55,12 @@ const NotificationBell = () => {
 
   // Счётчик: сразу и потом раз в минуту, а также когда вкладка снова становится активной
   useEffect(() => {
-    loadCount();
+    const first = setTimeout(loadCount, 0);
     const timer = setInterval(loadCount, POLL_MS);
     const onVisible = () => document.visibilityState === "visible" && loadCount();
     document.addEventListener("visibilitychange", onVisible);
     return () => {
+      clearTimeout(first);
       clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };

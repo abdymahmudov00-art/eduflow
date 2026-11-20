@@ -5,7 +5,7 @@ import Alert from "@/components/ui/alert/Alert";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/ui/input/Input";
 import MonthInput from "@/components/ui/month-input/MonthInput";
-import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
+import { FormActions, FormGrid } from "@/components/ui/form-layout/FormLayout";
 import { uuid4 } from "@/lib/api/payments";
 import type { Contract, PaymentCreate } from "@/lib/api/types";
 import { monthBlockReason, remainingFrom, type ContractMonth } from "@/lib/contract";

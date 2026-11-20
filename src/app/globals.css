@@ -46,6 +46,8 @@
   /* Металл: кнопки, аватары, полосы прогресса */
   --gradient-brand: linear-gradient(135deg, #f4f5f7 0%, #c9ccd2 55%, #eef0f2 100%);
   --gradient-metal-text: linear-gradient(180deg, #ffffff 0%, #d9dce1 40%, #8f949c 65%, #e6e8eb 100%);
+  /* Мягкий свет на фоне (страница входа, фон на телефоне) */
+  --glow: rgba(255, 255, 255, 0.07);
 
   --radius-lg: 16px;
   --radius: 14px;
@@ -96,6 +98,7 @@
 
   --gradient-brand: linear-gradient(135deg, #2b2f36 0%, #16181c 60%, #3a3e45 100%);
   --gradient-metal-text: linear-gradient(180deg, #3a3e45 0%, #16181c 45%, #6b717a 75%, #2a2d33 100%);
+  --glow: rgba(255, 255, 255, 0.9);
   --shadow-lg: 0 24px 50px -30px rgba(30, 34, 40, 0.35);
 }
 

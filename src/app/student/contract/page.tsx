@@ -22,7 +22,7 @@ import { contractsApi, finikApi, finikStatus, groupsApi, paymentsApi, studentsAp
 import type { FinikPayment, Payment } from "@/lib/api/types";
 import { activeLeaves, buildContractMonths, firstOpenMonth, isOnlinePayment, paymentPeriods } from "@/lib/contract";
 import { getErrorMessage, isConflict, isNotFound } from "@/lib/errors";
-import { formatDate, formatDateTime, formatMoney, formatMonth } from "@/lib/format";
+import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
 import { paymentMethodLabel } from "@/lib/labels";
 import styles from "../student.module.css";

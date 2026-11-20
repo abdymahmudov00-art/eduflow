@@ -40,7 +40,9 @@ const FinikCheckout = ({ payment, amount, onPaid, onClose, onRetry, onReceipt }:
   const [phase, setPhase] = useState<Phase>(() => phaseOf(payment.status));
   const [url, setUrl] = useState(payment.payment_url ?? null);
   const onPaidRef = useRef(onPaid);
-  onPaidRef.current = onPaid;
+  useEffect(() => {
+    onPaidRef.current = onPaid;
+  }, [onPaid]);
 
   useEffect(() => {
     if (phase !== "waiting") return;

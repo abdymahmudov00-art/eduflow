@@ -12,7 +12,7 @@
   left: 50%;
   width: 760px;
   height: 520px;
-  background: radial-gradient(closest-side, rgba(var(--fg-rgb), 0.1), rgba(var(--accent-rgb), 0));
+  background: radial-gradient(closest-side, var(--glow), rgba(255, 255, 255, 0));
   transform: translateX(-50%);
   pointer-events: none;
 }
