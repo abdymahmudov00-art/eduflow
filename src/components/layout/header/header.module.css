@@ -38,17 +38,6 @@
   border-radius: 999px;
 }
 
-.avatarLink {
-  display: inline-flex;
-  line-height: 0;
-  border-radius: 50%;
-}
-
-.avatarLink:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
 .iconBtn {
   display: grid;
   place-items: center;
@@ -113,9 +102,5 @@
 
   .logo {
     display: inline-flex;
-  }
-
-  .avatarLink {
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
   }
 }

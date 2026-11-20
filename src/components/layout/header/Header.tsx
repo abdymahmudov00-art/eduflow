@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import NotificationBell from "@/components/layout/notification-bell/NotificationBell";
-import Avatar from "@/components/ui/avatar/Avatar";
 import Icon from "@/components/ui/icon/Icon";
 import { findActiveItem, type NavItem } from "@/config/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -17,7 +16,7 @@ interface HeaderProps {
   onMenuClick: () => void;
 }
 
-/** Верхняя панель кабинета: название раздела, роль, аватар, выход */
+/** Верхняя панель кабинета: название раздела, роль, уведомления, выход (профиль — в карточке слева) */
 const Header = ({ items, profileHref, onMenuClick }: HeaderProps) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -56,9 +55,6 @@ const Header = ({ items, profileHref, onMenuClick }: HeaderProps) => {
             {ROLE_LABELS[session.role]}
           </span>
           <NotificationBell />
-          <Link href={profileHref} className={styles.avatarLink} aria-label="Профиль">
-            <Avatar name={session.username} size={40} />
-          </Link>
           <button
             type="button"
             className={`${styles.iconBtn} ${styles.logoutBtn}`}
