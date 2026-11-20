@@ -67,13 +67,6 @@ export default function StudentPersonalPage() {
                 <Alert tone="info">Анкета на проверке у администратора. Можно дополнить её, если что-то забыли.</Alert>
               </div>
             )}
-            {info?.status === "approved" && (
-              <div className={styles.note}>
-                <Alert tone="success">
-                  Анкета принята{info.reviewed_at ? ` ${formatDateTime(info.reviewed_at)}` : ""}.
-                </Alert>
-              </div>
-            )}
 
             <div className={styles.photoBlock}>
               <PhotoUpload studentId={data.student.id} name={info ? fullNameWithMiddle(info) : data.student.student_number} />
@@ -101,6 +94,15 @@ export default function StudentPersonalPage() {
                 Скан паспорта загрузить пока нельзя: хранение документов ещё настраивают на сервере.
               </span>
             </div>
+
+            {info?.status === "approved" && (
+              <div className={styles.reviewed}>
+                <Icon name="check" size={16} />
+                <span>
+                  Анкета принята{info.reviewed_at ? ` ${formatDateTime(info.reviewed_at)}` : ""}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}
