@@ -6,6 +6,7 @@ import BalanceCard from "@/components/page/student/balance-card/BalanceCard";
 import GroupPanel from "@/components/page/student/group-panel/GroupPanel";
 import FinikCheckout from "@/components/page/student/finik-checkout/FinikCheckout";
 import PaymentForm from "@/components/page/student/payment-form/PaymentForm";
+import ReceiptView from "@/components/page/student/receipt-view/ReceiptView";
 import Alert from "@/components/ui/alert/Alert";
 import AsyncState from "@/components/ui/async-state/AsyncState";
 import Badge from "@/components/ui/badge/Badge";
@@ -19,7 +20,7 @@ import Table from "@/components/ui/table/Table";
 import GroupHistory from "@/components/page/shared/group-history/GroupHistory";
 import { contractsApi, finikApi, finikStatus, groupsApi, paymentsApi, studentsApi } from "@/lib/api";
 import type { FinikPayment, Payment } from "@/lib/api/types";
-import { activeLeaves, buildContractMonths, firstOpenMonth, isOnlinePayment } from "@/lib/contract";
+import { activeLeaves, buildContractMonths, firstOpenMonth, isOnlinePayment, paymentPeriods } from "@/lib/contract";
 import { getErrorMessage, isConflict, isNotFound } from "@/lib/errors";
 import { formatDate, formatDateTime, formatMoney, formatMonth } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
@@ -56,6 +57,8 @@ export default function StudentContractPage() {
   // Онлайн-оплата Finik: созданный платёж и сумма — показываем экран ожидания
   const [checkout, setCheckout] = useState<{ payment: FinikPayment; amount: string } | null>(null);
   const [resumeError, setResumeError] = useState<string | null>(null);
+  // Электронный чек Finik: номер платежа, чей чек открыт
+  const [receiptFor, setReceiptFor] = useState<number | null>(null);
   const closePayment = () => {
     setPaying(false);
     setCheckout(null);
@@ -186,7 +189,26 @@ export default function StudentContractPage() {
                 rowKey={(p) => p.id}
                 emptyText="По этому контракту ещё не было платежей"
                 columns={[
-                  { key: "month", header: "Месяц", render: (p) => formatMonth(p.payment_month) },
+                  {
+                    key: "periods",
+                    header: "За что",
+                    render: (p) => {
+                      const periods = paymentPeriods(p);
+                      if (periods.length === 0) return "—";
+                      // Один месяц — просто название; несколько — список с суммами
+                      if (periods.length === 1) return <span className={styles.capital}>{periods[0].label}</span>;
+                      return (
+                        <span className={styles.periods}>
+                          {periods.map((x) => (
+                            <span key={x.label}>
+                              <span className={styles.capital}>{x.label}</span>
+                              {x.amount !== null && <em> · {formatMoney(x.amount)}</em>}
+                            </span>
+                          ))}
+                        </span>
+                      );
+                    },
+                  },
                   { key: "amount", header: "Сумма", align: "right", render: (p) => formatMoney(p.amount) },
                   { key: "method", header: "Способ", render: (p) => paymentMethodLabel(p.payment_method) },
                   { key: "created", header: "Создан", render: (p) => formatDateTime(p.created_at) },
@@ -210,6 +232,10 @@ export default function StudentContractPage() {
                         <Button size="sm" variant="secondary" onClick={() => resumePayment(p)}>
                           Оплатить
                         </Button>
+                      ) : p.status === "confirmed" && isOnlinePayment(p) ? (
+                        <Button size="sm" variant="ghost" icon="receipt" onClick={() => setReceiptFor(p.id)}>
+                          Чек
+                        </Button>
                       ) : null,
                   },
                 ]}
@@ -218,6 +244,10 @@ export default function StudentContractPage() {
           </div>
         )}
       </AsyncState>
+
+      <Modal open={receiptFor !== null} title="Подтверждение оплаты" onClose={() => setReceiptFor(null)}>
+        {receiptFor !== null && <ReceiptView paymentId={receiptFor} onClose={() => setReceiptFor(null)} />}
+      </Modal>
 
       <Modal open={paying} title={checkout ? "Оплата онлайн" : "Оплата"} onClose={closePayment}>
         {checkout ? (
@@ -233,6 +263,12 @@ export default function StudentContractPage() {
               refresh();
             }}
             onRetry={() => setCheckout(null)}
+            onReceipt={() => {
+              const id = checkout.payment.payment_id;
+              closePayment();
+              refresh();
+              setReceiptFor(id);
+            }}
           />
         ) : (
           <PaymentForm

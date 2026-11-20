@@ -28,13 +28,15 @@ interface FinikCheckoutProps {
   onClose: () => void;
   /** Попробовать ещё раз — вернуться к форме */
   onRetry: () => void;
+  /** Открыть электронный чек оплаченного платежа */
+  onReceipt?: () => void;
 }
 
 /**
  * Экран онлайн-оплаты: ссылка на оплату Finik и ожидание подтверждения.
  * Подтверждение приходит на бэкенд от Finik (webhook), а мы раз в 3 секунды спрашиваем статус.
  */
-const FinikCheckout = ({ payment, amount, onPaid, onClose, onRetry }: FinikCheckoutProps) => {
+const FinikCheckout = ({ payment, amount, onPaid, onClose, onRetry, onReceipt }: FinikCheckoutProps) => {
   const [phase, setPhase] = useState<Phase>(() => phaseOf(payment.status));
   const [url, setUrl] = useState(payment.payment_url ?? null);
   const onPaidRef = useRef(onPaid);
@@ -81,9 +83,14 @@ const FinikCheckout = ({ payment, amount, onPaid, onClose, onRetry }: FinikCheck
         </span>
         <h3 className={styles.title}>Оплата прошла</h3>
         <p className={styles.text}>{formatMoney(amount)} зачислено. Баланс уже обновлён.</p>
-        <Button fullWidth onClick={onClose}>
-          Готово
-        </Button>
+        <div className={styles.actions}>
+          {onReceipt && (
+            <Button variant="secondary" icon="receipt" onClick={onReceipt}>
+              Чек
+            </Button>
+          )}
+          <Button onClick={onClose}>Готово</Button>
+        </div>
       </div>
     );
   }

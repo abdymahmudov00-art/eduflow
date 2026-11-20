@@ -1,6 +1,6 @@
 import { http } from "./client";
 import { uuid4 } from "./payments";
-import type { FinikPayment, FinikPaymentCreate, FinikResolve, FinikTransaction } from "./types";
+import type { FinikPayment, FinikPaymentCreate, FinikReceipt, FinikResolve, FinikTransaction } from "./types";
 
 /** Привести статус Finik к нижнему регистру: PENDING → pending */
 export const finikStatus = (status: string | null | undefined) => (status ?? "").toLowerCase();
@@ -11,6 +11,9 @@ export const finikApi = {
     http.post<FinikPayment>("/finik/payments", { request_id: uuid4(), ...data }),
   /** Статус онлайн-оплаты (опрашиваем, пока студент платит) */
   getPayment: (paymentId: number) => http.get<FinikPayment>(`/finik/payments/${paymentId}`),
+
+  /** Электронное подтверждение (чек) оплаченного платежа */
+  receipt: (paymentId: number) => http.get<FinikReceipt>(`/finik/receipts/${paymentId}`),
 
   /** Админ: список транзакций Finik */
   transactions: (params: { status?: string; staleMinutes?: number; limit?: number; offset?: number } = {}) => {

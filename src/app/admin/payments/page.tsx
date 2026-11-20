@@ -27,6 +27,7 @@ import {
   isAwaitingReview,
   isMonthOpen,
   isOnlinePayment,
+  paymentPeriods,
 } from "@/lib/contract";
 import { getErrorMessage, isConflict } from "@/lib/errors";
 import { formatDateTime, formatMoney, formatMonth, fullName, toNumber } from "@/lib/format";
@@ -87,7 +88,11 @@ export default function AdminPaymentsPage() {
   const confirmedTotal = isCollege
     ? selectedPayments.filter((p) => p.status === "confirmed").reduce((sum, p) => sum + toNumber(p.amount), 0)
     : months.reduce((sum, m) => sum + m.paidAmount, 0);
-  const outOfSchedule = isCollege ? [] : selectedPayments.filter((p) => !months.some((m) => m.key === p.payment_month));
+  const outOfSchedule = isCollege
+    ? []
+    : selectedPayments.filter(
+        (p) => !p.allocations?.length && !months.some((m) => m.key === p.payment_month),
+      );
 
   const changeStatus = async (payment: Payment, status: "confirmed" | "rejected") => {
     setBusyId(payment.id);
@@ -180,7 +185,12 @@ export default function AdminPaymentsPage() {
                 { key: "id", header: "№", width: 60, render: (p) => p.id },
                 { key: "student", header: "Студент", render: (p) => <strong>{studentNameForContract(p.contract_id)}</strong> },
                 { key: "contract", header: "Контракт", render: (p) => `№${p.contract_id}` },
-                { key: "month", header: "Месяц", render: (p) => formatMonth(p.payment_month) },
+                {
+                  key: "month",
+                  header: "За что",
+                  // Платёж может закрыть несколько месяцев — показываем, куда засчитан
+                  render: (p) => paymentPeriods(p).map((x) => x.label).join(", ") || "—",
+                },
                 { key: "amount", header: "Сумма", align: "right", render: (p) => formatMoney(p.amount) },
                 { key: "method", header: "Способ", render: (p) => paymentMethodLabel(p.payment_method) },
                 { key: "created", header: "Создан", render: (p) => formatDateTime(p.created_at) },

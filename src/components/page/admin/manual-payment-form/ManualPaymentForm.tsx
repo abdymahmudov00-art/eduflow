@@ -8,7 +8,7 @@ import MonthInput from "@/components/ui/month-input/MonthInput";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import { uuid4 } from "@/lib/api/payments";
 import type { Contract, PaymentCreate } from "@/lib/api/types";
-import { monthBlockReason, type ContractMonth } from "@/lib/contract";
+import { monthBlockReason, remainingFrom, type ContractMonth } from "@/lib/contract";
 import { getErrorMessage, isFinalError } from "@/lib/errors";
 import { formatMoney, toNumber } from "@/lib/format";
 
@@ -56,8 +56,10 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
       setAmountError("Больше нуля");
       return;
     }
-    if (monthInfo && value > monthInfo.remainingAmount) {
-      setAmountError(`Не больше остатка за месяц: ${formatMoney(monthInfo.remainingAmount)}`);
+    // Наличными тоже можно закрыть сразу несколько месяцев — лимит: остаток с этого месяца до конца
+    const max = remainingFrom(months, month);
+    if (monthInfo && value > max) {
+      setAmountError(`Не больше остатка по контракту с этого месяца: ${formatMoney(max)}`);
       return;
     }
     setAmountError(undefined);
@@ -115,7 +117,9 @@ const ManualPaymentForm = ({ contract, months, month: initialMonth, onSubmit, on
             value={amount}
             error={amountError}
             hint={
-              monthInfo && !blockReason ? `Остаток за месяц: ${formatMoney(monthInfo.remainingAmount)}` : undefined
+              monthInfo && !blockReason
+                ? `Остаток за месяц: ${formatMoney(monthInfo.remainingAmount)}. Больше — уйдёт в следующие месяцы`
+                : undefined
             }
             onChange={(e) => {
               setAmount(e.target.value);

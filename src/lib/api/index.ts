@@ -7,6 +7,7 @@ export { groupsApi } from "./groups";
 export { contractsApi } from "./contracts";
 export { paymentsApi } from "./payments";
 export { finikApi, finikStatus } from "./finik";
+export { notificationsApi } from "./notifications";
 export { schedulesApi } from "./schedules";
 export { studyApi } from "./study";
 export type * from "./types";

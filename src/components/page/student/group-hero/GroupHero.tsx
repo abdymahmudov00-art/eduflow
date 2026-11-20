@@ -22,6 +22,12 @@ const GroupHero = ({ group }: { group: Group | null }) => (
           С {formatDate(group.start_date)}
           <span className={styles.dot}>•</span>
           {group.course_name}
+          {group.mentor_name && (
+            <>
+              <span className={styles.dot}>•</span>
+              Ментор: {group.mentor_name}
+            </>
+          )}
         </p>
         <Link href="/student/schedule" className={styles.link} aria-label="Расписание группы">
           <Icon name="chevron" size={20} />

@@ -86,6 +86,8 @@ export interface Student {
   user_id: number;
   group_id: number | null;
   student_number: string;
+  /** Ментор текущей группы */
+  mentor_name?: string | null;
   personal_info: PersonalInfo | null;
   group_history: GroupHistoryItem[];
 }
@@ -128,6 +130,7 @@ export interface Group {
   id: number;
   name: string;
   course_name: string;
+  mentor_name?: string | null;
   start_date: string;
   end_date: string | null;
   schedules: Schedule[];
@@ -136,6 +139,7 @@ export interface Group {
 export interface GroupInput {
   name: string;
   course_name: string;
+  mentor_name?: string | null;
   start_date: string;
   end_date?: string | null;
 }
@@ -174,6 +178,8 @@ export interface Contract {
   payment_day: number | null;
   academic_leaves: AcademicLeave[];
   type: ContractType;
+  /** College: на сколько взносов разбита сумма (2 или 3) */
+  installment_count?: number | null;
 }
 
 export interface ContractInput {
@@ -184,6 +190,7 @@ export interface ContractInput {
   start_date: string;
   payment_day?: number | null;
   type?: ContractType;
+  installment_count?: number | null;
 }
 
 export interface Payment {
@@ -198,6 +205,45 @@ export interface Payment {
   paid_at: string | null;
   confirmed_by_admin_id: number | null;
   payment_month: string | null;
+  /** За какие месяцы (периоды) засчитан платёж. Пусто — пока не подтверждён */
+  allocations?: PaymentAllocation[];
+}
+
+/** Часть платежа, засчитанная за один месяц (Academy) или взнос (College) */
+export interface PaymentAllocation {
+  id: number;
+  /** Номер месяца/взноса в контракте, с 1 */
+  period_index: number;
+  /** "YYYY-MM" для Academy, null для College */
+  payment_month: string | null;
+  amount: Money;
+}
+
+/** GET /finik/receipts/{payment_id}: электронное подтверждение оплаты */
+export interface FinikReceipt {
+  receipt_number: string;
+  payment_id: number;
+  amount: Money;
+  currency: string;
+  provider_transaction_id: string;
+  provider_operation_id: string | null;
+  provider_paid_at: string | null;
+  confirmed_at: string;
+  verification_source: string;
+  allocation_snapshot: Array<Record<string, unknown>>;
+  created_at: string;
+}
+
+export type NotificationType = "payment_confirmed" | "payment_due" | "payment_overdue" | "schedule_changed";
+
+export interface AppNotification {
+  id: number;
+  /** Обычно один из NotificationType, но бэкенд может добавить новые */
+  type: string;
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
 }
 
 /** request_id можно не передавать — paymentsApi.create сгенерирует его сам */
@@ -225,6 +271,10 @@ export interface Balance {
   /** Следующий платёж: дата (YYYY-MM-DD) и сумма */
   next_due_date?: string | null;
   next_due_amount?: Money | null;
+  /** College: сколько взносов всего, сколько оплачено и сумма следующего */
+  installment_count?: number | null;
+  paid_installments?: number | null;
+  next_installment_amount?: Money | null;
 }
 
 /** POST /finik/payments: онлайн-оплата по QR через Finik */

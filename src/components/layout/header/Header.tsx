@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import NotificationBell from "@/components/layout/notification-bell/NotificationBell";
 import Avatar from "@/components/ui/avatar/Avatar";
 import Icon from "@/components/ui/icon/Icon";
 import { findActiveItem, type NavItem } from "@/config/navigation";
@@ -54,6 +55,7 @@ const Header = ({ items, profileHref, onMenuClick }: HeaderProps) => {
             <Icon name={session.role === "admin" ? "shield" : "book"} size={15} />
             {ROLE_LABELS[session.role]}
           </span>
+          <NotificationBell />
           <Link href={profileHref} className={styles.avatarLink} aria-label="Профиль">
             <Avatar name={session.username} size={40} />
           </Link>

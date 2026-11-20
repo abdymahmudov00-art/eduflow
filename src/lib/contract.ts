@@ -1,7 +1,7 @@
 // Помесячный график контракта, собранный из платежей (в API нет отдельной сущности «месяц»)
 
 import type { AcademicLeave, Contract, Payment } from "@/lib/api/types";
-import { toNumber } from "@/lib/format";
+import { formatMonth, toNumber } from "@/lib/format";
 
 export type MonthStatus = "paid" | "partial" | "pending" | "leave" | "rejected" | "expected";
 
@@ -77,6 +77,29 @@ const sumOf = (payments: Payment[], status: Payment["status"]) =>
       .reduce((sum, p) => sum + toNumber(p.amount), 0),
   );
 
+/**
+ * Сколько подтверждённый платёж засчитал за месяц.
+ * Новые платежи несут allocations (бэкенд сам раскладывает деньги по месяцам — можно оплатить
+ * несколько месяцев сразу). У старых allocations нет — тогда вся сумма идёт в payment_month.
+ */
+function confirmedFor(payment: Payment, key: string, index: number): number {
+  if (payment.status !== "confirmed") return 0;
+  if (payment.allocations && payment.allocations.length > 0) {
+    return payment.allocations
+      .filter((a) => (a.payment_month ? a.payment_month === key : a.period_index === index))
+      .reduce((sum, a) => sum + toNumber(a.amount), 0);
+  }
+  return payment.payment_month === key ? toNumber(payment.amount) : 0;
+}
+
+/** Платёж относится к месяцу: засчитан в него или создан за него */
+function touchesMonth(payment: Payment, key: string, index: number): boolean {
+  if (payment.allocations?.some((a) => (a.payment_month ? a.payment_month === key : a.period_index === index))) {
+    return true;
+  }
+  return payment.payment_month === key;
+}
+
 function statusFor(payments: Payment[], leave: AcademicLeave | null, paid: number, due: number): MonthStatus {
   if (paid > 0 && paid >= due) return "paid";
   if (payments.some(isAwaitingReview)) return "pending";
@@ -93,12 +116,16 @@ export function buildContractMonths(contract: Contract, payments: Payment[]): Co
   const due = toNumber(contract.monthly_payment);
   return Array.from({ length: contract.duration_months }, (_, i) => {
     const key = addMonths(start, i);
-    const monthPayments = own.filter((p) => p.payment_month === key);
+    const index = i + 1;
+    const monthPayments = own.filter((p) => touchesMonth(p, key, index));
     const leave = leaveFor(contract, key);
-    const paidAmount = sumOf(monthPayments, "confirmed");
-    const pendingAmount = sumOf(monthPayments, "pending");
+    const paidAmount = round2(monthPayments.reduce((sum, p) => sum + confirmedFor(p, key, index), 0));
+    const pendingAmount = sumOf(
+      monthPayments.filter((p) => p.payment_month === key),
+      "pending",
+    );
     return {
-      index: i + 1,
+      index,
       key,
       status: statusFor(monthPayments, leave, paidAmount, due),
       payments: monthPayments,
@@ -132,3 +159,49 @@ export function monthBlockReason(month: ContractMonth | undefined): string | nul
 export function firstOpenMonth(months: ContractMonth[]): string | undefined {
   return months.find(isMonthOpen)?.key;
 }
+
+/**
+ * Как сумма разойдётся по месяцам, начиная с выбранного: сначала закрывает остаток этого месяца,
+ * потом следующие (месяцы в академ. отпуске пропускаются). Это подсказка для студента —
+ * окончательно раскладывает бэкенд, итог виден в allocations платежа.
+ */
+export function previewAllocation(
+  months: ContractMonth[],
+  startKey: string,
+  amount: number,
+): { key: string; amount: number }[] {
+  const result: { key: string; amount: number }[] = [];
+  let left = round2(amount);
+  for (const month of months) {
+    if (left <= 0) break;
+    if (month.key < startKey || !isMonthOpen(month)) continue;
+    const part = Math.min(left, month.remainingAmount);
+    result.push({ key: month.key, amount: round2(part) });
+    left = round2(left - part);
+  }
+  return result;
+}
+
+/** Сколько ещё можно заплатить по контракту, начиная с месяца (сумма остатков открытых месяцев) */
+export function remainingFrom(months: ContractMonth[], startKey: string): number {
+  return round2(
+    months.filter((m) => m.key >= startKey && isMonthOpen(m)).reduce((sum, m) => sum + m.remainingAmount, 0),
+  );
+}
+
+/**
+ * Подпись «за что» платёж: месяцы из allocations (если бэкенд разложил платёж),
+ * иначе месяц из payment_month. Для College — номер взноса.
+ */
+export function paymentPeriods(payment: Payment): { label: string; amount: number | null }[] {
+  if (payment.allocations && payment.allocations.length > 0) {
+    return [...payment.allocations]
+      .sort((a, b) => a.period_index - b.period_index)
+      .map((a) => ({
+        label: a.payment_month ? formatMonth(a.payment_month) : `Взнос ${a.period_index}`,
+        amount: toNumber(a.amount),
+      }));
+  }
+  return payment.payment_month ? [{ label: formatMonth(payment.payment_month), amount: null }] : [];
+}
+

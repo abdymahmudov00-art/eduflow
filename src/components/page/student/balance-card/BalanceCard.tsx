@@ -29,6 +29,12 @@ const BalanceCard = ({ contract, balance, payments = [] }: BalanceCardProps) => 
   const overdueAmount = toNumber(balance?.overdue_amount ?? 0);
   const nextAmount = balance?.next_due_amount != null ? toNumber(balance.next_due_amount) : null;
   const nextDate = balance?.next_due_date ?? null;
+  // College: взносы вместо месяцев
+  const isCollege = contract.type === "college";
+  const installmentCount = balance?.installment_count ?? contract.installment_count ?? null;
+  const paidInstallments = balance?.paid_installments ?? 0;
+  const nextInstallment =
+    balance?.next_installment_amount != null ? toNumber(balance.next_installment_amount) : null;
   const percent = total > 0 ? Math.min((paid / total) * 100, 100) : 0;
 
   return (
@@ -62,7 +68,25 @@ const BalanceCard = ({ contract, balance, payments = [] }: BalanceCardProps) => 
         </div>
       )}
 
-      {(nextAmount !== null || nextDate) && remaining > 0 && (
+      {isCollege && installmentCount ? (
+        <div className={styles.installments}>
+          <div className={styles.steps} aria-label={`Оплачено взносов: ${paidInstallments} из ${installmentCount}`}>
+            {Array.from({ length: installmentCount }, (_, i) => (
+              <span key={i} className={i < paidInstallments ? styles.stepDone : styles.step}>
+                {i + 1}
+              </span>
+            ))}
+          </div>
+          {nextInstallment !== null && nextInstallment > 0 && remaining > 0 && (
+            <div className={styles.next}>
+              <span className={styles.label}>Следующий взнос</span>
+              <strong>{formatMoney(nextInstallment)}</strong>
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      {!isCollege && (nextAmount !== null || nextDate) && remaining > 0 && (
         <div className={styles.next}>
           <span className={styles.label}>Следующий платёж</span>
           <strong>
@@ -77,16 +101,27 @@ const BalanceCard = ({ contract, balance, payments = [] }: BalanceCardProps) => 
           <dt>Сумма контракта</dt>
           <dd>{formatMoney(total)}</dd>
         </div>
-        <div>
-          <dt>В месяц</dt>
-          <dd>{formatMoney(contract.monthly_payment)}</dd>
-        </div>
-        <div>
-          <dt>Оплачено месяцев</dt>
-          <dd>
-            {balance?.paid_months ?? 0} из {contract.duration_months}
-          </dd>
-        </div>
+        {isCollege && installmentCount ? (
+          <div>
+            <dt>Оплачено взносов</dt>
+            <dd>
+              {paidInstallments} из {installmentCount}
+            </dd>
+          </div>
+        ) : (
+          <>
+            <div>
+              <dt>В месяц</dt>
+              <dd>{formatMoney(contract.monthly_payment)}</dd>
+            </div>
+            <div>
+              <dt>Оплачено месяцев</dt>
+              <dd>
+                {balance?.paid_months ?? 0} из {contract.duration_months}
+              </dd>
+            </div>
+          </>
+        )}
         {contract.payment_day && (
           <div>
             <dt>День оплаты</dt>

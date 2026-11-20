@@ -105,3 +105,37 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
+
+/* College: взносы кружками 1 · 2 · 3 */
+.installments {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.steps {
+  display: flex;
+  gap: 8px;
+}
+
+.step,
+.stepDone {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+  font-weight: 800;
+  border-radius: 50%;
+}
+
+.step {
+  color: var(--color-muted);
+  border: 1px dashed var(--color-border-strong);
+}
+
+.stepDone {
+  color: #fff;
+  background: var(--gradient-brand);
+}

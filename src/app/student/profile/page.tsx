@@ -80,6 +80,7 @@ export default function StudentProfilePage() {
                   { label: "Номер студента", value: data.student.student_number },
                   { label: "Группа", value: data.group?.name ?? "—" },
                   { label: "Курс", value: data.group?.course_name ?? "—" },
+                  { label: "Ментор", value: data.student.mentor_name || data.group?.mentor_name || "—" },
                   {
                     label: "Период",
                     value: data.group

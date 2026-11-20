@@ -28,6 +28,7 @@ const GroupPanel = ({ group }: { group: Group | null }) => (
         <div className={styles.text}>
           <span className={styles.course}>{group.course_name}</span>
           <span className={styles.name}>{group.name}</span>
+          {group.mentor_name && <span className={styles.mentor}>Ментор: {group.mentor_name}</span>}
         </div>
       </div>
     ) : (

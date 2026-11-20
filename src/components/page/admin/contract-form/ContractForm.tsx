@@ -40,6 +40,7 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
   const [duration, setDuration] = useState(contract ? String(contract.duration_months) : "");
   const [startDate, setStartDate] = useState(contract?.start_date ?? "");
   const [type, setType] = useState<ContractType>(contract?.type ?? "academy");
+  const [installments, setInstallments] = useState(String(contract?.installment_count ?? 2));
   const [paymentDay, setPaymentDay] = useState(contract?.payment_day ? String(contract.payment_day) : "");
   const [errors, setErrors] = useState<Errors>({});
   const [serverError, setServerError] = useState<string | null>(null);
@@ -78,6 +79,8 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
         start_date: startDate,
         payment_day: paymentDay ? Number(paymentDay) : null,
         type,
+        // College платит взносами (2 или 3); для Academy поле не передаём
+        installment_count: type === "college" ? Number(installments) : null,
       });
     } catch (err) {
       setServerError(getErrorMessage(err));
@@ -118,10 +121,28 @@ const ContractForm = ({ contract, students, onSubmit, onCancel }: ContractFormPr
             hint={
               type === "academy"
                 ? "Каждый платёж привязан к месяцу — видно, какие месяцы оплачены"
-                : "Платежи идут в общий баланс, месяц указывать не обязательно"
+                : "Сумма делится на 2 или 3 взноса, месяц указывать не нужно"
             }
           />
         </FullRow>
+        {type === "college" && (
+          <FullRow>
+            <Select
+              label="Количество взносов"
+              options={[
+                { value: "2", label: "2 взноса" },
+                { value: "3", label: "3 взноса" },
+              ]}
+              value={installments}
+              onChange={(e) => setInstallments(e.target.value)}
+              hint={
+                toNumber(total) > 0
+                  ? `По ${formatMoney(toNumber(total) / Number(installments))} за взнос`
+                  : "На сколько частей делится сумма контракта"
+              }
+            />
+          </FullRow>
+        )}
         <Input
           label="Общая сумма"
           required

@@ -20,6 +20,7 @@ type Errors = Partial<Record<keyof GroupInput, string>>;
 const GroupForm = ({ group, onSubmit, onCancel }: GroupFormProps) => {
   const [name, setName] = useState(group?.name ?? "");
   const [courseName, setCourseName] = useState(group?.course_name ?? "");
+  const [mentorName, setMentorName] = useState(group?.mentor_name ?? "");
   const [startDate, setStartDate] = useState(group?.start_date ?? "");
   const [endDate, setEndDate] = useState(group?.end_date ?? "");
   const [errors, setErrors] = useState<Errors>({});
@@ -47,6 +48,7 @@ const GroupForm = ({ group, onSubmit, onCancel }: GroupFormProps) => {
       await onSubmit({
         name: name.trim(),
         course_name: courseName.trim(),
+        mentor_name: mentorName.trim() || null,
         start_date: startDate,
         end_date: endDate || null,
       });
@@ -83,6 +85,16 @@ const GroupForm = ({ group, onSubmit, onCancel }: GroupFormProps) => {
             value={courseName}
             error={errors.course_name}
             onChange={(e) => setCourseName(e.target.value)}
+          />
+        </FullRow>
+        <FullRow>
+          <Input
+            label="Ментор"
+            placeholder="Имя и фамилия ментора"
+            maxLength={150}
+            value={mentorName}
+            hint="Студенты увидят его в своей группе и профиле"
+            onChange={(e) => setMentorName(e.target.value)}
           />
         </FullRow>
         <DateInput

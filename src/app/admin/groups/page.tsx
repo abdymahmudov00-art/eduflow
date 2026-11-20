@@ -77,6 +77,7 @@ export default function GroupsPage() {
           columns={[
             { key: "name", header: "Группа", render: (g) => <strong>{g.name}</strong> },
             { key: "course", header: "Курс", render: (g) => g.course_name },
+            { key: "mentor", header: "Ментор", render: (g) => g.mentor_name || "—" },
             {
               key: "dates",
               header: "Период",

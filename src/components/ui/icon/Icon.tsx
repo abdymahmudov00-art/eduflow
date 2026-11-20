@@ -26,7 +26,10 @@ export type IconName =
   | "info"
   | "dots"
   | "edit"
-  | "trash";
+  | "trash"
+  | "bell"
+  | "receipt"
+  | "alert";
 
 const PATHS: Record<IconName, ReactNode> = {
   home: <path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z" />,
@@ -182,6 +185,27 @@ const PATHS: Record<IconName, ReactNode> = {
       <path d="M6 7l1 13h10l1-13" />
       <path d="M10 11v5" />
       <path d="M14 11v5" />
+    </>
+  ),
+  bell: (
+    <>
+      <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z" />
+      <path d="M10 20.5a2 2 0 0 0 4 0" />
+    </>
+  ),
+  receipt: (
+    <>
+      <path d="M6 3.5h12v17l-2-1.3-2 1.3-2-1.3-2 1.3-2-1.3-2 1.3z" />
+      <path d="M9 8h6" />
+      <path d="M9 11.5h6" />
+      <path d="M9 15h3.5" />
+    </>
+  ),
+  alert: (
+    <>
+      <path d="M12 4 3 19.5h18z" />
+      <path d="M12 10v4.5" />
+      <path d="M12 17h.01" />
     </>
   ),
   sparkle: <path d="m12 3.5 1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z" />,

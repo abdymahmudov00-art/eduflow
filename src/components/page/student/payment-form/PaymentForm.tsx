@@ -9,9 +9,10 @@ import Select from "@/components/ui/select/Select";
 import { FormActions, FormGrid, FullRow } from "@/components/ui/form-layout/FormLayout";
 import { uuid4 } from "@/lib/api/payments";
 import type { Balance, Contract, Payment, PaymentCreate } from "@/lib/api/types";
-import { buildContractMonths, firstOpenMonth, monthBlockReason } from "@/lib/contract";
+import { buildContractMonths, firstOpenMonth, isMonthOpen, monthBlockReason, previewAllocation, remainingFrom } from "@/lib/contract";
 import { getErrorMessage, isFinalError } from "@/lib/errors";
-import { currentMonth, formatMoney, toNumber } from "@/lib/format";
+import { currentMonth, formatMoney, formatMonth, toNumber } from "@/lib/format";
+import styles from "./payment-form.module.css";
 
 interface PaymentFormProps {
   contracts: Contract[];
@@ -48,8 +49,19 @@ const PaymentForm = ({
 
   const [contractId, setContractId] = useState(first ? String(first.id) : "");
   const [month, setMonth] = useState(startMonth);
+  const collegeDefault = (c: Contract | undefined) => {
+    const b = balances.find((x) => x.contract_id === c?.id);
+    const next = b?.next_installment_amount != null ? toNumber(b.next_installment_amount) : 0;
+    return next > 0 ? next : toNumber(c?.monthly_payment ?? 0);
+  };
   const [amount, setAmount] = useState(
-    startRemaining ? amountText(startRemaining) : first ? amountText(toNumber(first.monthly_payment)) : "",
+    first?.type === "college"
+      ? amountText(collegeDefault(first))
+      : startRemaining
+        ? amountText(startRemaining)
+        : first
+          ? amountText(toNumber(first.monthly_payment))
+          : "",
   );
   const [errors, setErrors] = useState<{ contract?: string; amount?: string; month?: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
@@ -76,7 +88,7 @@ const PaymentForm = ({
     setContractId(value);
     const next = contracts.find((c) => String(c.id) === value);
     const nextMonths = next?.type === "college" ? [] : monthsOf(next);
-    if (next?.type === "college") setAmount(amountText(toNumber(next.monthly_payment)));
+    if (next?.type === "college") setAmount(amountText(collegeDefault(next)));
     const key = firstOpenMonth(nextMonths) ?? month;
     setMonth(key);
     fillAmount(nextMonths, key);
@@ -99,8 +111,8 @@ const PaymentForm = ({
       else if (blockReason) next.month = blockReason;
     }
     if (!(value > 0)) next.amount = "Сумма должна быть больше нуля";
-    else if (monthInfo && !blockReason && value > monthInfo.remainingAmount)
-      next.amount = `За этот месяц можно внести не больше ${formatMoney(monthInfo.remainingAmount)}`;
+    else if (!isCollege && monthInfo && !blockReason && value > maxFromMonth)
+      next.amount = `Начиная с этого месяца можно внести не больше ${formatMoney(maxFromMonth)}`;
     else if (contractRemaining !== undefined && value > contractRemaining)
       next.amount = "Больше, чем осталось оплатить по контракту";
     setErrors(next);
@@ -123,6 +135,26 @@ const PaymentForm = ({
       setSubmitting(false);
     }
   };
+
+  // Academy: можно оплатить сразу несколько месяцев — деньги идут с выбранного месяца дальше
+  const maxFromMonth = isCollege ? 0 : remainingFrom(months, month);
+  const value = toNumber(amount.replace(",", "."));
+  const plan = !isCollege && monthInfo && !blockReason && value > 0 ? previewAllocation(months, month, value) : [];
+  /** Быстрый выбор: 1, 2, 3 месяца или весь остаток */
+  const quick = isCollege
+    ? []
+    : [1, 2, 3]
+        .map((n) => {
+          const open = months.filter((m) => m.key >= month && isMonthOpen(m)).slice(0, n);
+          return open.length === n
+            ? { label: n === 1 ? "1 месяц" : `${n} месяца`, sum: open.reduce((a, m) => a + m.remainingAmount, 0) }
+            : null;
+        })
+        .filter((x): x is { label: string; sum: number } => x !== null);
+  const installmentHint =
+    isCollege && balance?.installment_count
+      ? `Взнос ${Math.min((balance.paid_installments ?? 0) + 1, balance.installment_count)} из ${balance.installment_count}`
+      : undefined;
 
   if (contracts.length === 0) {
     return <Alert tone="info">У вас нет активных контрактов для оплаты.</Alert>;
@@ -154,7 +186,10 @@ const PaymentForm = ({
             required
             options={contracts.map((c) => ({
               value: String(c.id),
-              label: `Контракт №${c.id} · ${formatMoney(c.monthly_payment)}/мес`,
+              label:
+                c.type === "college"
+                  ? `Контракт №${c.id} · Колледж${c.installment_count ? `, ${c.installment_count} взноса` : ""}`
+                  : `Контракт №${c.id} · ${formatMoney(c.monthly_payment)}/мес`,
             }))}
             value={contractId}
             error={errors.contract}
@@ -164,7 +199,7 @@ const PaymentForm = ({
         </FullRow>
         {!isCollege && (
           <MonthInput
-            label="За какой месяц"
+            label="С какого месяца"
             required
             value={month}
             error={errors.month ?? blockReason ?? undefined}
@@ -178,18 +213,52 @@ const PaymentForm = ({
           inputMode="decimal"
           value={amount}
           error={errors.amount}
-          hint={
-            monthInfo && !blockReason
-              ? monthInfo.remainingAmount < monthInfo.dueAmount
-                ? `Остаток за месяц: ${formatMoney(monthInfo.remainingAmount)}`
-                : "Можно оплатить частями"
-              : undefined
-          }
+          hint={isCollege ? installmentHint : "Можно частично или сразу за несколько месяцев"}
           onChange={(e) => {
             setAmount(e.target.value);
             setErrors((prev) => ({ ...prev, amount: undefined }));
           }}
         />
+        {quick.length > 0 && !blockReason && (
+          <FullRow>
+            <div className={styles.quick}>
+              {quick.map((q) => (
+                <button
+                  key={q.label}
+                  type="button"
+                  className={`${styles.chip} ${Math.abs(q.sum - value) < 0.01 ? styles.chipActive : ""}`}
+                  onClick={() => {
+                    setAmount(amountText(q.sum));
+                    setErrors((prev) => ({ ...prev, amount: undefined }));
+                  }}
+                >
+                  {q.label}
+                  <span>{formatMoney(q.sum)}</span>
+                </button>
+              ))}
+            </div>
+          </FullRow>
+        )}
+        {plan.length > 0 && (
+          <FullRow>
+            <div className={styles.plan}>
+              <span className={styles.planTitle}>Оплата покроет</span>
+              {plan.map((p) => {
+                const info = months.find((m) => m.key === p.key);
+                const partial = info ? p.amount < info.remainingAmount : false;
+                return (
+                  <div key={p.key} className={styles.planRow}>
+                    <span>
+                      {formatMonth(p.key)}
+                      {partial && <em> — частично</em>}
+                    </span>
+                    <strong>{formatMoney(p.amount)}</strong>
+                  </div>
+                );
+              })}
+            </div>
+          </FullRow>
+        )}
       </FormGrid>
       <FormActions>
         <Button variant="secondary" onClick={onCancel} disabled={submitting}>

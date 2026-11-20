@@ -257,3 +257,23 @@
     padding: 4px 18px 20px;
   }
 }
+
+/* История платежей: за какие месяцы засчитан платёж */
+.periods {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.periods em {
+  font-style: normal;
+  color: var(--color-muted);
+}
+
+.capital {
+  display: inline-block;
+}
+
+.capital::first-letter {
+  text-transform: uppercase;
+}
