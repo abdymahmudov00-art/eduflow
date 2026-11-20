@@ -1,4 +1,17 @@
 .hero {
+  /* Витрина всегда тёмная (графит), поэтому и в дневной теме текст на ней светлый */
+  color-scheme: dark;
+  --color-text: #f4f5f7;
+  --color-muted: #b5bac2;
+  --color-primary-text: #e6e8eb;
+  --color-success: #a9cdb8;
+  --color-warning: #d9c59a;
+  --color-danger: #e0a4a4;
+  --color-primary: #e6e8eb;
+  --color-on-primary: #15171b;
+  --fg-rgb: 255, 255, 255;
+  --gradient-brand: linear-gradient(135deg, #f4f5f7 0%, #c9ccd2 55%, #eef0f2 100%);
+  color: var(--color-text);
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
@@ -11,9 +24,9 @@
   padding: 28px 30px;
   overflow: hidden;
   background: var(--gradient-hero);
-  border: 1px solid rgba(167, 139, 250, 0.25);
+  border: 1px solid rgba(230, 232, 235, 0.25);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 50px -24px rgba(124, 58, 237, 0.7);
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.45);
 }
 
 .hero::after {
@@ -23,7 +36,7 @@
   right: -60px;
   width: 240px;
   height: 240px;
-  border: 1px solid rgba(196, 181, 253, 0.2);
+  border: 1px solid rgba(230, 232, 235, 0.2);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -31,7 +44,7 @@
 .eyebrow {
   grid-area: eyebrow;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.7);
@@ -43,7 +56,7 @@
   place-items: center;
   width: 72px;
   height: 72px;
-  color: #ddd6fe;
+  color: #d9dce1;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 22px;
@@ -53,7 +66,7 @@
   grid-area: name;
   margin: 4px 0;
   font-size: 44px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.03em;
 }

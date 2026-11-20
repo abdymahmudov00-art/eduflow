@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/layout/Layout";
 
-const manrope = Manrope({
+const inter = Inter({
   subsets: ["cyrillic", "latin"],
   variable: "--font-main",
 });
+
+/** Ставит сохранённую тему до первой отрисовки, чтобы страница не мигала тёмным */
+const themeScript = `try{var t=localStorage.getItem("eduflow-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
 export const metadata: Metadata = {
   title: { default: "EduFlow", template: "%s · EduFlow" },
@@ -18,12 +21,18 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0e0e13",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#15171b" },
+    { media: "(prefers-color-scheme: light)", color: "#eceef1" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ru" className={manrope.variable}>
+    <html lang="ru" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <Layout>{children}</Layout>
       </body>

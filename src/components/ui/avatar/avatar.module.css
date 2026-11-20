@@ -4,7 +4,7 @@
   place-items: center;
   font-weight: 700;
   line-height: 1;
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--gradient-brand);
   border-radius: 50%;
   letter-spacing: 0.02em;

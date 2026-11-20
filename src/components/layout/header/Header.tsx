@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import NotificationBell from "@/components/layout/notification-bell/NotificationBell";
+import ThemeToggle from "@/components/layout/theme-toggle/ThemeToggle";
 import Icon from "@/components/ui/icon/Icon";
 import { findActiveItem, type NavItem } from "@/config/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -54,6 +55,7 @@ const Header = ({ items, profileHref, onMenuClick }: HeaderProps) => {
             <Icon name={session.role === "admin" ? "shield" : "book"} size={15} />
             {ROLE_LABELS[session.role]}
           </span>
+          <ThemeToggle />
           <NotificationBell />
           <button
             type="button"

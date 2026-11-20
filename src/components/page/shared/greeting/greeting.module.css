@@ -16,9 +16,14 @@
 
 .title {
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.15;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  /* Металлический отлив, как в макете: серебро ночью, графит днём */
+  background: var(--gradient-metal-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .avatar {
@@ -34,6 +39,7 @@
 
 .wave {
   display: inline-block;
+  -webkit-text-fill-color: initial;
   transform-origin: 70% 70%;
 }
 

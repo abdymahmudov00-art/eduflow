@@ -100,7 +100,7 @@
 .nav:hover {
   transform: none;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--fg-rgb), 0.07);
 }
 
 .flip {
@@ -125,12 +125,12 @@
 
 .month:hover {
   transform: none;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--fg-rgb), 0.07);
 }
 
 .active,
 .active:hover {
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--color-primary);
 }
 

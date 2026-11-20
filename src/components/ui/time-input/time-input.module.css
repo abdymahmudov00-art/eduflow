@@ -65,7 +65,7 @@
 .toggle:hover,
 .toggleOpen {
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--fg-rgb), 0.07);
   transform: translateY(-50%);
 }
 
@@ -121,12 +121,12 @@
 
 .cell:hover {
   transform: none;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--fg-rgb), 0.07);
 }
 
 .cellActive,
 .cellActive:hover {
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--color-primary);
 }
 

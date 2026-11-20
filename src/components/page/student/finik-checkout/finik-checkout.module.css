@@ -16,7 +16,7 @@
 
 .amount strong {
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
@@ -34,10 +34,10 @@
   padding: 0 20px;
   font-size: 16px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--gradient-brand);
   border-radius: var(--radius-sm);
-  box-shadow: 0 10px 24px -12px rgba(139, 92, 246, 0.9);
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.45);
 }
 
 .payLink:hover {
@@ -81,7 +81,7 @@
 
 .title {
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .text {

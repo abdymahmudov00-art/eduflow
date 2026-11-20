@@ -31,9 +31,9 @@
   height: 19px;
   padding: 0 5px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 19px;
-  color: #fff;
+  color: var(--color-on-primary);
   text-align: center;
   background: var(--color-primary);
   border: 2px solid var(--color-bg);
@@ -124,7 +124,7 @@
 }
 
 .unread {
-  background: rgba(139, 92, 246, 0.07);
+  background: rgba(var(--accent-rgb), 0.07);
 }
 
 .icon {

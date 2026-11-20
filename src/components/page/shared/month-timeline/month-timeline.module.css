@@ -20,15 +20,15 @@
   margin-bottom: 10px;
   padding: 4px 10px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   border-radius: 999px;
   color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(var(--fg-rgb), 0.06);
 }
 
 .title {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .period {
@@ -50,8 +50,8 @@
 }
 
 .paid {
-  background: linear-gradient(180deg, rgba(52, 211, 153, 0.08), var(--color-surface) 70%);
-  border-color: rgba(52, 211, 153, 0.3);
+  background: linear-gradient(180deg, rgba(var(--success-rgb), 0.08), var(--color-surface) 70%);
+  border-color: rgba(var(--success-rgb), 0.3);
 }
 
 .paid .status {
@@ -65,7 +65,7 @@
 }
 
 .pending {
-  border-color: rgba(251, 191, 36, 0.3);
+  border-color: rgba(var(--warning-rgb), 0.3);
 }
 
 .pending .status {
@@ -74,7 +74,7 @@
 }
 
 .rejected {
-  border-color: rgba(248, 113, 113, 0.3);
+  border-color: rgba(var(--danger-rgb), 0.3);
 }
 
 .rejected .status {
@@ -83,7 +83,7 @@
 }
 
 .leave {
-  border-color: rgba(96, 165, 250, 0.3);
+  border-color: rgba(var(--info-rgb), 0.3);
   border-style: dashed;
 }
 
@@ -93,7 +93,7 @@
 }
 
 .partial {
-  border-color: rgba(96, 165, 250, 0.35);
+  border-color: rgba(var(--info-rgb), 0.35);
 }
 
 .partial .status {

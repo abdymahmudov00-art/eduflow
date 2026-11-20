@@ -1,4 +1,17 @@
 .hero {
+  /* Витрина всегда тёмная (графит), поэтому и в дневной теме текст на ней светлый */
+  color-scheme: dark;
+  --color-text: #f4f5f7;
+  --color-muted: #b5bac2;
+  --color-primary-text: #e6e8eb;
+  --color-success: #a9cdb8;
+  --color-warning: #d9c59a;
+  --color-danger: #e0a4a4;
+  --color-primary: #e6e8eb;
+  --color-on-primary: #15171b;
+  --fg-rgb: 255, 255, 255;
+  --gradient-brand: linear-gradient(135deg, #f4f5f7 0%, #c9ccd2 55%, #eef0f2 100%);
+  color: var(--color-text);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -7,9 +20,9 @@
   padding: 22px;
   overflow: hidden;
   background: var(--gradient-hero);
-  border: 1px solid rgba(167, 139, 250, 0.25);
+  border: 1px solid rgba(230, 232, 235, 0.25);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 50px -24px rgba(124, 58, 237, 0.7);
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.45);
 }
 
 .top {
@@ -21,7 +34,7 @@
 
 .label {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.75);
@@ -48,7 +61,7 @@
 
 .value {
   font-size: 44px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -66,8 +79,8 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--color-success);
-  background: rgba(52, 211, 153, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.25);
+  background: rgba(169, 205, 184, 0.12);
+  border: 1px solid rgba(169, 205, 184, 0.25);
   border-radius: 999px;
 }
 

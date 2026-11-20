@@ -26,28 +26,28 @@
 }
 
 .violet {
-  color: #c4b5fd;
-  background: rgba(139, 92, 246, 0.16);
+  color: var(--color-text);
+  background: rgba(var(--accent-rgb), 0.16);
 }
 
 .red {
-  color: #fca5a5;
-  background: rgba(248, 113, 113, 0.14);
+  color: var(--color-text);
+  background: rgba(var(--danger-rgb), 0.14);
 }
 
 .blue {
-  color: #93c5fd;
-  background: rgba(96, 165, 250, 0.14);
+  color: var(--color-text);
+  background: rgba(var(--info-rgb), 0.14);
 }
 
 .amber {
-  color: #fcd34d;
-  background: rgba(251, 191, 36, 0.14);
+  color: var(--color-text);
+  background: rgba(var(--warning-rgb), 0.14);
 }
 
 .green {
-  color: #6ee7b7;
-  background: rgba(52, 211, 153, 0.14);
+  color: var(--color-text);
+  background: rgba(var(--success-rgb), 0.14);
 }
 
 .text {

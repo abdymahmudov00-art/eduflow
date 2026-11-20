@@ -1,47 +1,108 @@
 :root {
   color-scheme: dark;
 
-  --color-bg: #0e0e13;
-  --color-sidebar: #121218;
-  --color-surface: #17171e;
-  --color-surface-2: #1f1f28;
-  --color-border: #262631;
-  --color-border-strong: #34343f;
-  --color-text: #f4f4f7;
-  --color-muted: #9898a6;
+  /* Ночь: графит и серебро, без неона */
+  --color-bg: #15171b;
+  --color-sidebar: #181a1e;
+  --color-surface: #1d2025;
+  --color-surface-2: #24282e;
+  --color-border: #2c3037;
+  --color-border-strong: #3a3f47;
+  --color-text: #eceef1;
+  --color-muted: #9da3ad;
 
-  --color-primary: #8b5cf6;
-  --color-primary-hover: #7c4ef0;
-  --color-primary-soft: rgba(139, 92, 246, 0.16);
-  --color-primary-text: #c4b5fd;
+  /* Главный акцент — светлое серебро, текст на нём тёмный */
+  --color-primary: #e6e8eb;
+  --color-primary-hover: #ffffff;
+  --color-primary-soft: rgba(230, 232, 235, 0.09);
+  --color-primary-text: #e6e8eb;
+  --color-on-primary: #15171b;
 
-  --color-success: #34d399;
-  --color-success-soft: rgba(52, 211, 153, 0.13);
-  --color-warning: #fbbf24;
-  --color-warning-soft: rgba(251, 191, 36, 0.13);
-  --color-danger: #f87171;
-  --color-danger-strong: #ef4444;
-  --color-danger-hover: #dc2626;
-  --color-danger-soft: rgba(248, 113, 113, 0.13);
-  --color-info: #60a5fa;
-  --color-info-soft: rgba(96, 165, 250, 0.13);
+  /* Статусы приглушённые, почти серые — цвет только там, где он несёт смысл */
+  --color-success: #a9cdb8;
+  --color-success-soft: rgba(169, 205, 184, 0.1);
+  --color-warning: #d9c59a;
+  --color-warning-soft: rgba(217, 197, 154, 0.1);
+  --color-danger: #e0a4a4;
+  --color-danger-strong: #b85c5c;
+  --color-danger-hover: #a34d4d;
+  --color-danger-soft: rgba(224, 164, 164, 0.1);
+  --color-info: #b8c4d4;
+  --color-info-soft: rgba(184, 196, 212, 0.1);
 
-  --gradient-hero: radial-gradient(120% 140% at 85% 0%, rgba(139, 92, 246, 0.45) 0%, rgba(139, 92, 246, 0) 55%),
-    linear-gradient(135deg, #2b2163 0%, #1c1745 55%, #15122f 100%);
-  --gradient-brand: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  /* RGB-тройки для полупрозрачных оттенков: rgba(var(--fg-rgb), 0.06) */
+  --fg-rgb: 255, 255, 255;
+  --accent-rgb: 230, 232, 235;
+  --bg-rgb: 21, 23, 27;
+  --surface-rgb: 29, 32, 37;
+  --success-rgb: 169, 205, 184;
+  --warning-rgb: 217, 197, 154;
+  --danger-rgb: 224, 164, 164;
+  --info-rgb: 184, 196, 212;
 
-  --radius-lg: 20px;
-  --radius: 16px;
+  /* Тёмная «витрина» (hero-карточки) — графит с мягким светом, в обеих темах */
+  --gradient-hero: radial-gradient(90% 120% at 90% 0%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(160deg, #2a2e35 0%, #1c1f24 55%, #15171b 100%);
+  /* Металл: кнопки, аватары, полосы прогресса */
+  --gradient-brand: linear-gradient(135deg, #f4f5f7 0%, #c9ccd2 55%, #eef0f2 100%);
+  --gradient-metal-text: linear-gradient(180deg, #ffffff 0%, #d9dce1 40%, #8f949c 65%, #e6e8eb 100%);
+
+  --radius-lg: 16px;
+  --radius: 14px;
   --radius-sm: 10px;
-  --shadow-lg: 0 24px 60px -16px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 30px 60px -30px rgba(0, 0, 0, 0.85);
 
   --sidebar-width: 248px;
+}
+
+/* День: светло-серый фон, белые карточки, графитовый акцент */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg: #eceef1;
+  --color-sidebar: #f4f5f7;
+  --color-surface: #f9fafb;
+  --color-surface-2: #eef0f2;
+  --color-border: #dcdfe4;
+  --color-border-strong: #c6cad1;
+  --color-text: #16181c;
+  --color-muted: #5a606a;
+
+  --color-primary: #1f2329;
+  --color-primary-hover: #000000;
+  --color-primary-soft: rgba(22, 24, 28, 0.07);
+  --color-primary-text: #16181c;
+  --color-on-primary: #f4f5f7;
+
+  --color-success: #3c6a50;
+  --color-success-soft: rgba(60, 106, 80, 0.09);
+  --color-warning: #7a6230;
+  --color-warning-soft: rgba(122, 98, 48, 0.1);
+  --color-danger: #9a3f3f;
+  --color-danger-strong: #a94848;
+  --color-danger-hover: #8f3a3a;
+  --color-danger-soft: rgba(154, 63, 63, 0.08);
+  --color-info: #3e5168;
+  --color-info-soft: rgba(62, 81, 104, 0.09);
+
+  --fg-rgb: 20, 22, 26;
+  --accent-rgb: 22, 24, 28;
+  --bg-rgb: 236, 238, 241;
+  --surface-rgb: 249, 250, 251;
+  --success-rgb: 60, 106, 80;
+  --warning-rgb: 122, 98, 48;
+  --danger-rgb: 154, 63, 63;
+  --info-rgb: 62, 81, 104;
+
+  --gradient-brand: linear-gradient(135deg, #2b2f36 0%, #16181c 60%, #3a3e45 100%);
+  --gradient-metal-text: linear-gradient(180deg, #3a3e45 0%, #16181c 45%, #6b717a 75%, #2a2d33 100%);
+  --shadow-lg: 0 24px 50px -30px rgba(30, 34, 40, 0.35);
 }
 
 * {
   margin: 0;
   padding: 0;
-  font-family: var(--font-main), sans-serif;
+  font-family: var(--font-main), system-ui, sans-serif;
   box-sizing: border-box;
   text-decoration: none;
   /* outline: 1px solid blue; */
@@ -50,6 +111,7 @@
 body {
   color: var(--color-text);
   background: var(--color-bg);
+  transition: background-color 0.2s ease, color 0.2s ease;
   -webkit-font-smoothing: antialiased;
 }
 

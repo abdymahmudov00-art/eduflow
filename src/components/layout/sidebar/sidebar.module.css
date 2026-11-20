@@ -22,7 +22,7 @@
   align-items: center;
   gap: 12px;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   letter-spacing: 0.02em;
 }
@@ -32,10 +32,10 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--gradient-brand);
   border-radius: 10px;
-  box-shadow: 0 6px 20px -6px rgba(139, 92, 246, 0.8);
+  box-shadow: 0 6px 20px -6px rgba(0, 0, 0, 0.45);
 }
 
 .closeBtn {

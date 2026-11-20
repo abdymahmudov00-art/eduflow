@@ -65,7 +65,7 @@
 .toggle:hover,
 .toggleOpen {
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--fg-rgb), 0.07);
   transform: translateY(-50%);
 }
 
@@ -105,7 +105,7 @@
 .nav:hover {
   transform: none;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--fg-rgb), 0.07);
 }
 
 .flip {
@@ -162,7 +162,7 @@
 
 .day:hover {
   transform: none;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(var(--fg-rgb), 0.07);
 }
 
 .today {
@@ -171,7 +171,7 @@
 
 .selected,
 .selected:hover {
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--color-primary);
 }
 
@@ -190,7 +190,7 @@
 
 .todayBtn:hover {
   transform: none;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--fg-rgb), 0.04);
 }
 
 .error {

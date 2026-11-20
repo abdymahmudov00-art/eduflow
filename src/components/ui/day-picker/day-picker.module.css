@@ -54,7 +54,7 @@
 
 .on,
 .on:hover {
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--color-primary);
   border-color: var(--color-primary);
 }
@@ -86,7 +86,7 @@
 .presetOn {
   color: var(--color-primary-text);
   border-style: solid;
-  border-color: rgba(139, 92, 246, 0.5);
+  border-color: rgba(var(--accent-rgb), 0.5);
   background: var(--color-primary-soft);
 }
 

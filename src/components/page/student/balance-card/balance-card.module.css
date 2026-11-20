@@ -89,7 +89,7 @@
   font-size: 13px;
   color: var(--color-danger);
   background: var(--color-danger-soft);
-  border: 1px solid rgba(248, 113, 113, 0.25);
+  border: 1px solid rgba(var(--danger-rgb), 0.25);
   border-radius: var(--radius-sm);
 }
 
@@ -126,7 +126,7 @@
   width: 32px;
   height: 32px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   border-radius: 50%;
 }
 
@@ -136,6 +136,6 @@
 }
 
 .stepDone {
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--gradient-brand);
 }
