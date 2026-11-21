@@ -45,7 +45,7 @@
   color: var(--color-on-primary);
   background: var(--gradient-brand);
   border-radius: 12px;
-  box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 28px -8px rgba(24, 92, 150, 0.3);
 }
 
 .card {

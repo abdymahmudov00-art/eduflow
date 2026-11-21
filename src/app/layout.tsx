@@ -8,9 +8,6 @@ const inter = Inter({
   variable: "--font-main",
 });
 
-/** Ставит сохранённую тему до первой отрисовки, чтобы страница не мигала тёмным */
-const themeScript = `try{var t=localStorage.getItem("eduflow-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
-
 export const metadata: Metadata = {
   title: { default: "EduFlow", template: "%s · EduFlow" },
   description: "Учёт студентов, контрактов и оплат",
@@ -21,18 +18,12 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#15171b" },
-    { media: "(prefers-color-scheme: light)", color: "#eceef1" },
-  ],
+  themeColor: "#6fbcf0",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ru" className={inter.variable} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+    <html lang="ru" className={inter.variable}>
       <body>
         <Layout>{children}</Layout>
       </body>

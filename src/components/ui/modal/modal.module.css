@@ -6,7 +6,7 @@
   align-items: flex-start;
   justify-content: center;
   padding: 64px 16px 16px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(15, 42, 71, 0.45);
   backdrop-filter: blur(4px);
   overflow-y: auto;
   animation: fade 0.15s ease-out;

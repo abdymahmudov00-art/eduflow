@@ -1,105 +1,63 @@
 :root {
-  color-scheme: dark;
-
-  /* Ночь: графит и серебро, без неона */
-  --color-bg: #15171b;
-  --color-sidebar: #181a1e;
-  --color-surface: #1d2025;
-  --color-surface-2: #24282e;
-  --color-border: #2c3037;
-  --color-border-strong: #3a3f47;
-  --color-text: #eceef1;
-  --color-muted: #9da3ad;
-
-  /* Главный акцент — светлое серебро, текст на нём тёмный */
-  --color-primary: #e6e8eb;
-  --color-primary-hover: #ffffff;
-  --color-primary-soft: rgba(230, 232, 235, 0.09);
-  --color-primary-text: #e6e8eb;
-  --color-on-primary: #15171b;
-
-  /* Статусы приглушённые, почти серые — цвет только там, где он несёт смысл */
-  --color-success: #a9cdb8;
-  --color-success-soft: rgba(169, 205, 184, 0.1);
-  --color-warning: #d9c59a;
-  --color-warning-soft: rgba(217, 197, 154, 0.1);
-  --color-danger: #e0a4a4;
-  --color-danger-strong: #b85c5c;
-  --color-danger-hover: #a34d4d;
-  --color-danger-soft: rgba(224, 164, 164, 0.1);
-  --color-info: #b8c4d4;
-  --color-info-soft: rgba(184, 196, 212, 0.1);
-
-  /* RGB-тройки для полупрозрачных оттенков: rgba(var(--fg-rgb), 0.06) */
-  --fg-rgb: 255, 255, 255;
-  --accent-rgb: 230, 232, 235;
-  --bg-rgb: 21, 23, 27;
-  --surface-rgb: 29, 32, 37;
-  --success-rgb: 169, 205, 184;
-  --warning-rgb: 217, 197, 154;
-  --danger-rgb: 224, 164, 164;
-  --info-rgb: 184, 196, 212;
-
-  /* Тёмная «витрина» (hero-карточки) — графит с мягким светом, в обеих темах */
-  --gradient-hero: radial-gradient(90% 120% at 90% 0%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 55%),
-    linear-gradient(160deg, #2a2e35 0%, #1c1f24 55%, #15171b 100%);
-  /* Металл: кнопки, аватары, полосы прогресса */
-  --gradient-brand: linear-gradient(135deg, #f4f5f7 0%, #c9ccd2 55%, #eef0f2 100%);
-  --gradient-metal-text: linear-gradient(180deg, #ffffff 0%, #d9dce1 40%, #8f949c 65%, #e6e8eb 100%);
-  /* Мягкий свет на фоне (страница входа, фон на телефоне) */
-  --glow: rgba(255, 255, 255, 0.07);
-
-  --radius-lg: 16px;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow-lg: 0 30px 60px -30px rgba(0, 0, 0, 0.85);
-
-  --sidebar-width: 248px;
-}
-
-/* День: светло-серый фон, белые карточки, графитовый акцент */
-:root[data-theme="light"] {
   color-scheme: light;
 
-  --color-bg: #eceef1;
-  --color-sidebar: #f4f5f7;
-  --color-surface: #f9fafb;
-  --color-surface-2: #eef0f2;
-  --color-border: #dcdfe4;
-  --color-border-strong: #c6cad1;
-  --color-text: #16181c;
-  --color-muted: #5a606a;
+  /* «Небо»: голубой фон, плотные облачно-белые блоки, полупрозрачные синие кнопки */
+  --color-bg: #a8d8f8;
+  --color-sidebar: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-2: #f2f8fd;
+  --color-border: #e1edf7;
+  --color-border-strong: #cbe0f1;
+  --color-text: #0f2a47;
+  --color-muted: #4d6782;
 
-  --color-primary: #1f2329;
-  --color-primary-hover: #000000;
-  --color-primary-soft: rgba(22, 24, 28, 0.07);
-  --color-primary-text: #16181c;
-  --color-on-primary: #f4f5f7;
+  /* Главный акцент — синий; кнопки чуть прозрачные, текст на них белый */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #e8f2fd;
+  --color-primary-text: #1d5fbf;
+  --color-on-primary: #ffffff;
 
-  --color-success: #3c6a50;
-  --color-success-soft: rgba(60, 106, 80, 0.09);
-  --color-warning: #7a6230;
-  --color-warning-soft: rgba(122, 98, 48, 0.1);
-  --color-danger: #9a3f3f;
-  --color-danger-strong: #a94848;
-  --color-danger-hover: #8f3a3a;
-  --color-danger-soft: rgba(154, 63, 63, 0.08);
-  --color-info: #3e5168;
-  --color-info-soft: rgba(62, 81, 104, 0.09);
+  --color-success: #17794a;
+  --color-success-soft: #e6f6ee;
+  --color-warning: #92600a;
+  --color-warning-soft: #fdf3dc;
+  --color-danger: #b42335;
+  --color-danger-strong: #d92d43;
+  --color-danger-hover: #b42335;
+  --color-danger-soft: #fde9ec;
+  --color-info: #1d5fbf;
+  --color-info-soft: #e5f0fd;
 
-  --fg-rgb: 20, 22, 26;
-  --accent-rgb: 22, 24, 28;
-  --bg-rgb: 236, 238, 241;
-  --surface-rgb: 249, 250, 251;
-  --success-rgb: 60, 106, 80;
-  --warning-rgb: 122, 98, 48;
-  --danger-rgb: 154, 63, 63;
-  --info-rgb: 62, 81, 104;
+  /* RGB-тройки для полупрозрачных оттенков: rgba(var(--fg-rgb), 0.06) */
+  --fg-rgb: 15, 42, 71;
+  --accent-rgb: 37, 99, 235;
+  --bg-rgb: 255, 255, 255;
+  --surface-rgb: 255, 255, 255;
+  --success-rgb: 23, 121, 74;
+  --warning-rgb: 146, 96, 10;
+  --danger-rgb: 180, 35, 53;
+  --info-rgb: 29, 95, 191;
 
-  --gradient-brand: linear-gradient(135deg, #2b2f36 0%, #16181c 60%, #3a3e45 100%);
-  --gradient-metal-text: linear-gradient(180deg, #3a3e45 0%, #16181c 45%, #6b717a 75%, #2a2d33 100%);
-  --glow: rgba(255, 255, 255, 0.9);
-  --shadow-lg: 0 24px 50px -30px rgba(30, 34, 40, 0.35);
+  /* Небо за страницей */
+  --gradient-sky: linear-gradient(180deg, #6fbcf0 0%, #a8d8f8 45%, #d4ecfc 100%);
+  /* Яркие карточки-витрины: насыщенный синий с белыми облаками */
+  --gradient-hero: radial-gradient(60% 90% at 88% 0%, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0) 60%),
+    radial-gradient(50% 80% at 10% 110%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b8df6 100%);
+  /* Кнопки, аватары, полосы прогресса — полупрозрачный синий */
+  --gradient-brand: rgba(37, 99, 235, 0.78);
+  /* Заголовки — сплошной тёмно-синий (градиент из одного цвета, чтобы не трогать разметку) */
+  --gradient-metal-text: linear-gradient(var(--color-text), var(--color-text));
+  /* Облака на фоне (страница входа, фон на телефоне) */
+  --glow: rgba(255, 255, 255, 0.85);
+
+  --radius-lg: 20px;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --shadow-lg: 0 18px 40px -22px rgba(24, 92, 150, 0.45);
+
+  --sidebar-width: 248px;
 }
 
 * {
@@ -113,8 +71,7 @@
 
 body {
   color: var(--color-text);
-  background: var(--color-bg);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  background: var(--color-bg) var(--gradient-sky) fixed;
   -webkit-font-smoothing: antialiased;
 }
 

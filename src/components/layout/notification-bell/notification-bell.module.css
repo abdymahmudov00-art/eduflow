@@ -53,7 +53,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 24px 60px -16px rgba(24, 92, 150, 0.3);
 }
 
 .head {

@@ -1,16 +1,23 @@
 .hero {
-  /* Витрина всегда тёмная (графит), поэтому и в дневной теме текст на ней светлый */
-  color-scheme: dark;
-  --color-text: #f4f5f7;
-  --color-muted: #b5bac2;
-  --color-primary-text: #e6e8eb;
-  --color-success: #a9cdb8;
-  --color-warning: #d9c59a;
-  --color-danger: #e0a4a4;
-  --color-primary: #e6e8eb;
-  --color-on-primary: #15171b;
+  /* Витрина синяя, текст на ней белый */
+  color-scheme: light;
+  --color-text: #ffffff;
+  --color-muted: #dbeafe;
+  --color-primary-text: #ffffff;
+  --color-success: #bbf7d0;
+  --color-warning: #fde68a;
+  --color-danger: #fecdd3;
+  --color-success-soft: rgba(255, 255, 255, 0.16);
+  --color-warning-soft: rgba(255, 255, 255, 0.16);
+  --color-danger-soft: rgba(255, 255, 255, 0.16);
+  --color-info-soft: rgba(255, 255, 255, 0.16);
+  --color-primary-soft: rgba(255, 255, 255, 0.16);
+  --color-border: rgba(255, 255, 255, 0.25);
+  --color-surface-2: rgba(255, 255, 255, 0.14);
+  --color-primary: #ffffff;
+  --color-on-primary: #1d4ed8;
   --fg-rgb: 255, 255, 255;
-  --gradient-brand: linear-gradient(135deg, #f4f5f7 0%, #c9ccd2 55%, #eef0f2 100%);
+  --gradient-brand: #ffffff;
   color: var(--color-text);
   position: relative;
   display: flex;
@@ -20,9 +27,9 @@
   padding: 22px;
   overflow: hidden;
   background: var(--gradient-hero);
-  border: 1px solid rgba(230, 232, 235, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 20px 50px -24px rgba(24, 92, 150, 0.3);
 }
 
 .top {
@@ -79,8 +86,8 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--color-success);
-  background: rgba(169, 205, 184, 0.12);
-  border: 1px solid rgba(169, 205, 184, 0.25);
+  background: rgba(187, 247, 208, 0.12);
+  border: 1px solid rgba(187, 247, 208, 0.25);
   border-radius: 999px;
 }
 
