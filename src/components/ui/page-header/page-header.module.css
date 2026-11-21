@@ -5,6 +5,12 @@
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+  /* Белый блок: заголовок не теряется на фото здания */
+  padding: 20px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .title {

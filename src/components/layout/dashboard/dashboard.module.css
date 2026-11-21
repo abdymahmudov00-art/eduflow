@@ -2,6 +2,29 @@
   min-height: 100vh;
 }
 
+/* Фото здания на весь экран под блоками, поверх — лёгкая голубая дымка */
+.dashboard::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(220, 238, 252, 0.35) 0%, rgba(220, 238, 252, 0.1) 45%, rgba(220, 238, 252, 0.45) 100%),
+    var(--page-photo) var(--page-photo-position) / cover no-repeat,
+    var(--color-bg);
+  pointer-events: none;
+}
+
+.admin {
+  --page-photo: url("/bg/admin.jpg");
+  --page-photo-position: center 38%;
+}
+
+.student {
+  --page-photo: url("/bg/student.jpg");
+  --page-photo-position: center 30%;
+}
+
 .main {
   min-width: 0;
   margin-left: var(--sidebar-width);
@@ -14,19 +37,6 @@
 }
 
 @media (max-width: 960px) {
-  /* Мягкий свет на фоне, как в макете */
-  .dashboard::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(60% 40% at 100% 0%, var(--glow) 0%, rgba(255, 255, 255, 0) 70%),
-      radial-gradient(50% 35% at 0% 75%, var(--glow) 0%, rgba(255, 255, 255, 0) 70%),
-      var(--color-bg);
-    pointer-events: none;
-  }
-
   .main {
     margin-left: 0;
   }

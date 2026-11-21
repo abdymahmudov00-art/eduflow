@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Администрирование" 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
     <RoleGuard role="admin">
-      <Dashboard nav={ADMIN_NAV} tabs={ADMIN_TABS} profileHref="/admin/profile">
+      <Dashboard nav={ADMIN_NAV} tabs={ADMIN_TABS} profileHref="/admin/profile" background="admin">
         {children}
       </Dashboard>
     </RoleGuard>

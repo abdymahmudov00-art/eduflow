@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Личный кабинет" };
 export default function StudentLayout({ children }: LayoutProps<"/student">) {
   return (
     <RoleGuard role="student">
-      <Dashboard nav={STUDENT_NAV} tabs={STUDENT_TABS} profileHref="/student/profile">
+      <Dashboard nav={STUDENT_NAV} tabs={STUDENT_TABS} profileHref="/student/profile" background="student">
         {children}
       </Dashboard>
     </RoleGuard>

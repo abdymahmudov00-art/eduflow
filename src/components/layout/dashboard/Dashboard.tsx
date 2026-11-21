@@ -13,6 +13,8 @@ interface DashboardProps {
   /** Разделы нижней панели на телефоне */
   tabs: NavItem[];
   profileHref: string;
+  /** Фото здания на фоне: у админа и у студента разные снимки */
+  background: "admin" | "student";
   children: ReactNode;
 }
 
@@ -21,13 +23,13 @@ interface DashboardProps {
  * Компьютер: меню слева, верхняя панель и контент.
  * Телефон: логотип и аватар сверху, нижняя панель, остальные разделы — в «Ещё».
  */
-const Dashboard = ({ nav, tabs, profileHref, children }: DashboardProps) => {
+const Dashboard = ({ nav, tabs, profileHref, background, children }: DashboardProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const openMenu = useCallback(() => setMenuOpen(true), []);
 
   return (
     <MenuContext.Provider value={openMenu}>
-      <div className={styles.dashboard}>
+      <div className={`${styles.dashboard} ${styles[background]}`}>
         <Sidebar items={nav} profileHref={profileHref} open={menuOpen} onClose={() => setMenuOpen(false)} />
         <div className={styles.main}>
           <Header items={nav} profileHref={profileHref} onMenuClick={openMenu} />
