@@ -4,11 +4,9 @@ import { useOpenMenu } from "@/components/layout/dashboard/menu-context";
 import PromoBanner from "@/components/page/student/promo-banner/PromoBanner";
 import Icon from "@/components/ui/icon/Icon";
 import GroupHero from "@/components/page/student/group-hero/GroupHero";
-import Greeting from "@/components/page/shared/greeting/Greeting";
 import AsyncState from "@/components/ui/async-state/AsyncState";
 import SectionTile from "@/components/ui/section-tile/SectionTile";
 import { groupsApi, studentsApi } from "@/lib/api";
-import { useAuth } from "@/lib/auth/useAuth";
 import { isNotFound } from "@/lib/errors";
 import { useFetch } from "@/lib/hooks/useFetch";
 import styles from "./student.module.css";
@@ -27,20 +25,11 @@ async function loadHome() {
 
 /** Главная студента: текущая группа и четыре раздела кабинета */
 export default function StudentHomePage() {
-  const { session } = useAuth();
   const openMenu = useOpenMenu();
   const { data, loading, error, reload } = useFetch(loadHome);
-  const info = data?.student.personal_info;
 
   return (
     <>
-      <Greeting
-        name={info?.first_name ?? session?.username ?? ""}
-        avatarName={info ? `${info.first_name} ${info.last_name}` : session?.username}
-        profileHref="/student/profile"
-        subtitle="Хорошего продуктивного дня!"
-      />
-
       <AsyncState loading={loading} error={error} onRetry={reload}>
         {data && (
           <div className={styles.homeStack}>

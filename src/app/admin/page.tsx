@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Greeting from "@/components/page/shared/greeting/Greeting";
 import AsyncState from "@/components/ui/async-state/AsyncState";
 import { ButtonLink } from "@/components/ui/button/Button";
 import Card from "@/components/ui/card/Card";
@@ -13,7 +12,6 @@ import StatusBadge from "@/components/ui/status-badge/StatusBadge";
 import Table from "@/components/ui/table/Table";
 import { contractsApi, groupsApi, paymentsApi, studentsApi, usersApi } from "@/lib/api";
 import type { Payment } from "@/lib/api/types";
-import { useAuth } from "@/lib/auth/useAuth";
 import { formatDateTime, formatMoney, formatMonth, fullName, toNumber } from "@/lib/format";
 import { useFetch } from "@/lib/hooks/useFetch";
 import styles from "./admin.module.css";
@@ -31,7 +29,6 @@ async function loadOverview() {
 }
 
 export default function AdminOverviewPage() {
-  const { session } = useAuth();
   const { data, loading, error, reload } = useFetch(loadOverview);
 
   const payments = data?.payments ?? [];
@@ -49,7 +46,6 @@ export default function AdminOverviewPage() {
 
   return (
     <>
-      <Greeting name={session?.username ?? ""} profileHref="/admin/profile" />
 
       <AsyncState loading={loading} error={error} onRetry={reload}>
         {data && (
